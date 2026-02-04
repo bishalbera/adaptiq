@@ -1,137 +1,221 @@
-import { ApiKeyCheck } from "@/components/ApiKeyCheck";
-import Image from "next/image";
+"use client";
 
-const KeyFilesSection = () => (
-  <div className="bg-white px-8 py-4">
-    <h2 className="text-xl font-semibold mb-4">How it works:</h2>
-    <ul className="space-y-4 text-gray-600">
-      <li className="flex items-start gap-2">
-        <span>📄</span>
-        <span>
-          <code className="font-medium">src/app/layout.tsx</code> - Main layout
-          with TamboProvider
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span>📄</span>
-        <span>
-          <code className="font-medium font-mono">src/app/chat/page.tsx</code> -
-          Chat page with TamboProvider and MCP integration
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span>📄</span>
-        <span>
-          <code className="font-medium font-mono">
-            src/app/interactables/page.tsx
-          </code>{" "}
-          - Interactive demo page with tools and components
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span>📄</span>
-        <span>
-          <code className="font-medium font-mono">
-            src/components/tambo/message-thread-full.tsx
-          </code>{" "}
-          - Chat UI
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span>📄</span>
-        <span>
-          <code className="font-medium font-mono">
-            src/components/tambo/graph.tsx
-          </code>{" "}
-          - A generative graph component
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span>📄</span>
-        <span>
-          <code className="font-medium font-mono">
-            src/services/population-stats.ts
-          </code>{" "}
-          - Example tool implementation with mock population data
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span className="text-blue-500">📄</span>
-        <span>
-          <code className="font-medium font-mono">src/lib/tambo.ts</code> -
-          Component and tool registration
-        </span>
-      </li>
-      <li className="flex items-start gap-2">
-        <span className="text-blue-500">📄</span>
-        <span>
-          <code className="font-medium font-mono">README.md</code> - For more
-          details check out the README
-        </span>
-      </li>
-    </ul>
-    <div className="flex gap-4 flex-wrap mt-4">
-      <a
-        href="https://docs.tambo.co"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="px-6 py-3 rounded-md font-medium transition-colors text-lg mt-4 border border-gray-300 hover:bg-gray-50"
-      >
-        View Docs
-      </a>
-      <a
-        href="https://tambo.co/dashboard"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="px-6 py-3 rounded-md font-medium transition-colors text-lg mt-4 border border-gray-300 hover:bg-gray-50"
-      >
-        Dashboard
-      </a>
-    </div>
-  </div>
-);
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { getQuestionStats } from "@/data/questions";
 
 export default function Home() {
+  const stats = getQuestionStats();
+
   return (
-    <div className="min-h-screen p-8 flex flex-col items-center justify-center font-[family-name:var(--font-geist-sans)]">
-      <main className="max-w-2xl w-full space-y-8">
-        <div className="flex flex-col items-center">
-          <a href="https://tambo.co" target="_blank" rel="noopener noreferrer">
-            <Image
-              src="/Octo-Icon.svg"
-              alt="Tambo AI Logo"
-              width={80}
-              height={80}
-              className="mb-4"
-            />
-          </a>
-          <h1 className="text-4xl text-center">tambo-ai chat template</h1>
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50">
+      {/* Header */}
+      <header className="p-6">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-gray-800">
+            Adapt<span className="text-blue-600">IQ</span>
+          </h1>
+          <Link
+            href="/chat"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Start Practice
+          </Link>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <main className="max-w-4xl mx-auto px-6 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-5xl font-bold text-gray-900 mb-6">
+            JEE Prep That
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+              Adapts To You
+            </span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+            An AI-powered exam prep app that transforms based on your time,
+            mood, and stress level. Because everyone learns differently.
+          </p>
+          <Link
+            href="/chat"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white text-lg rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/30"
+          >
+            Start Practicing
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
+            </svg>
+          </Link>
+        </motion.div>
+
+        {/* Features Grid */}
+        <div className="grid md:grid-cols-3 gap-6 mb-16">
+          <FeatureCard
+            emoji="⏱️"
+            title="Time-Aware"
+            description="Got 10 minutes? Get rapid-fire mode. Got an hour? Deep practice with explanations."
+          />
+          <FeatureCard
+            emoji="🧘"
+            title="Stress-Aware"
+            description="Feeling overwhelmed? The app transforms into a calming, supportive interface."
+          />
+          <FeatureCard
+            emoji="📊"
+            title="Adaptive Difficulty"
+            description="Questions adjust based on your mood and performance. Bad day? Easier questions."
+          />
         </div>
 
-        <div className="w-full space-y-8">
-          <div className="bg-white px-8 py-4">
-            <h2 className="text-xl font-semibold mb-4">Setup Checklist</h2>
-            <ApiKeyCheck>
-              <div className="flex gap-4 flex-wrap">
-                <a
-                  href="/chat"
-                  className="px-6 py-3 rounded-md font-medium shadow-sm transition-colors text-lg mt-4 bg-[#7FFFC3] hover:bg-[#72e6b0] text-gray-800"
-                >
-                  Go to Chat →
-                </a>
-                <a
-                  href="/interactables"
-                  className="px-6 py-3 rounded-md font-medium shadow-sm transition-colors text-lg mt-4 bg-[#FFE17F] hover:bg-[#f5d570] text-gray-800"
-                >
-                  Interactables Demo →
-                </a>
-              </div>
-            </ApiKeyCheck>
+        {/* Stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
+        >
+          <h3 className="text-center text-gray-500 mb-6">
+            Question Bank Stats
+          </h3>
+          <div className="grid grid-cols-4 gap-4 text-center">
+            <StatBox label="Total Questions" value={stats.total} />
+            <StatBox
+              label="Physics"
+              value={stats.bySubject.physics}
+              color="text-blue-600"
+            />
+            <StatBox
+              label="Chemistry"
+              value={stats.bySubject.chemistry}
+              color="text-purple-600"
+            />
+            <StatBox
+              label="Math"
+              value={stats.bySubject.math}
+              color="text-orange-600"
+            />
           </div>
+        </motion.div>
 
-          <KeyFilesSection />
+        {/* How It Works */}
+        <div className="mt-16">
+          <h3 className="text-2xl font-bold text-center text-gray-800 mb-8">
+            How It Works
+          </h3>
+          <div className="space-y-4">
+            <StepCard
+              number={1}
+              title="Just type naturally"
+              description="Say things like 'I have 10 minutes for physics' or 'I'm stressed about calculus'"
+            />
+            <StepCard
+              number={2}
+              title="AI understands context"
+              description="The app detects your time, subject preference, and emotional state"
+            />
+            <StepCard
+              number={3}
+              title="UI transforms"
+              description="The interface adapts - quick mode, calm mode, deep practice, whatever you need"
+            />
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="mt-16 text-center">
+          <p className="text-gray-500 mb-4">
+            Built for the UI Strikes Back Hackathon
+          </p>
+          <p className="text-gray-400 text-sm">
+            Powered by{" "}
+            <a
+              href="https://tambo.co"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline"
+            >
+              Tambo AI
+            </a>
+          </p>
         </div>
       </main>
+    </div>
+  );
+}
+
+function FeatureCard({
+  emoji,
+  title,
+  description,
+}: {
+  emoji: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -4 }}
+      className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
+    >
+      <div className="text-4xl mb-4">{emoji}</div>
+      <h3 className="text-lg font-semibold text-gray-800 mb-2">{title}</h3>
+      <p className="text-gray-600 text-sm">{description}</p>
+    </motion.div>
+  );
+}
+
+function StatBox({
+  label,
+  value,
+  color = "text-gray-800",
+}: {
+  label: string;
+  value: number;
+  color?: string;
+}) {
+  return (
+    <div>
+      <p className={`text-3xl font-bold ${color}`}>{value}</p>
+      <p className="text-gray-500 text-sm">{label}</p>
+    </div>
+  );
+}
+
+function StepCard({
+  number,
+  title,
+  description,
+}: {
+  number: number;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="flex items-start gap-4 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+      <div className="shrink-0 w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
+        {number}
+      </div>
+      <div>
+        <h4 className="font-semibold text-gray-800">{title}</h4>
+        <p className="text-gray-600 text-sm">{description}</p>
+      </div>
     </div>
   );
 }

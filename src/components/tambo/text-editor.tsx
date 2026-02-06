@@ -167,6 +167,29 @@ export const TextEditor = React.forwardRef<TamboEditor, TextEditorProps>(
       syncTriggerState();
     }, [syncTriggerState]);
 
+    React.useEffect(() => {
+      const current = resourceNamesRef.current;
+      const entries = Object.entries(current);
+      if (entries.length === 0) return;
+
+      const next: Record<string, string> = {};
+      for (const [id, label] of entries) {
+        if (value.includes(`@${label}`)) {
+          next[id] = label;
+        }
+      }
+
+      if (
+        entries.length === Object.keys(next).length &&
+        entries.every(([id, label]) => next[id] === label)
+      ) {
+        return;
+      }
+
+      resourceNamesRef.current = next;
+      onResourceNamesChange(next);
+    }, [onResourceNamesChange, value]);
+
     React.useImperativeHandle(
       ref,
       () => ({
@@ -245,11 +268,21 @@ export const TextEditor = React.forwardRef<TamboEditor, TextEditorProps>(
         if (triggerState.type !== "resource") {
           insertAtCursor(`@${item.name} `);
         } else {
+          const replaceEnd =
+            triggerState.startIndex + 1 + triggerState.query.length;
+          const mentionText = `@${item.name} `;
           const nextValue =
-            value.slice(0, triggerState.startIndex) + `@${item.name} `;
+            value.slice(0, triggerState.startIndex) +
+            mentionText +
+            value.slice(replaceEnd);
+          const nextCaret = triggerState.startIndex + mentionText.length;
+
           onChange(nextValue);
           requestAnimationFrame(() => {
-            textareaRef.current?.focus();
+            const el = textareaRef.current;
+            if (!el) return;
+            el.focus();
+            el.setSelectionRange(nextCaret, nextCaret);
           });
         }
 
@@ -276,7 +309,9 @@ export const TextEditor = React.forwardRef<TamboEditor, TextEditorProps>(
     const handleSelectPrompt = React.useCallback(
       (item: PromptItem) => {
         if (triggerState.type === "prompt") {
-          onChange(value.slice(0, triggerState.startIndex));
+          const replaceEnd =
+            triggerState.startIndex + 1 + triggerState.query.length;
+          onChange(value.slice(0, triggerState.startIndex) + value.slice(replaceEnd));
         }
         onPromptSelect(item);
         setTriggerState({ type: null });
@@ -291,7 +326,11 @@ export const TextEditor = React.forwardRef<TamboEditor, TextEditorProps>(
     const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        await onSubmit(e as unknown as React.FormEvent);
+        try {
+          await onSubmit(e as unknown as React.FormEvent);
+        } catch (error) {
+          console.error("TextEditor submit failed:", error);
+        }
         return;
       }
 

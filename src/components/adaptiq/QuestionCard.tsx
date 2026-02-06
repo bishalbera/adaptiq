@@ -1,3 +1,5 @@
+"use client";
+
 import { z } from "zod";
 import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";

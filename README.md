@@ -1,131 +1,185 @@
-# Tambo Template
+# AdaptIQ
 
-This is a starter NextJS app with Tambo hooked up to get your AI app development started quickly.
+**Adaptive JEE Exam Preparation Platform** — Built for the Tambo "UI Strikes Back" Hackathon
 
-## Get Started
+AdaptIQ is an AI-powered study companion that dynamically transforms its UI based on your context: time available, stress level, exam proximity, and emotional state. It doesn't just quiz you—it understands you.
 
-1. Run `npm create-tambo@latest my-tambo-app` for a new project
+## The Problem
 
-2. `npm install`
+Traditional exam prep apps treat every student the same. But a student with 10 minutes before class needs a different experience than someone with 2 hours on a weekend. A stressed student needs encouragement, not pressure. AdaptIQ adapts.
 
-3. `npx tambo init`
+## Key Features
 
-- or rename `example.env.local` to `.env.local` and add your tambo API key you can get for free [here](https://tambo.co/dashboard).
+### Context-Aware UI Components
 
-4. Run `npm run dev` and go to `localhost:3000` to use the app!
+| Component | Triggers When | What It Does |
+|-----------|---------------|--------------|
+| **PracticeSession** | User wants to practice | Multi-question flow with mode-dependent behavior |
+| **QuestionCard** | Single question needed | Displays one question with instant feedback |
+| **MoodCheckIn** | Session start | Emoji picker that adjusts difficulty |
+| **ProgressCard** | User asks about progress | Stats, streaks, strong/weak topics |
+| **CalmMode** | Stress detected | Soothing UI, breathing exercises, accomplishments |
+| **ExamPanicMode** | Pre-exam crisis | Emergency intervention with countdown, tips, action plan |
+| **MistakeAnalysis** | Wrong answer analysis | Deep dive into WHY they got it wrong |
 
-## Customizing
+### Three Practice Modes
 
-### Change what components tambo can control
+- **Quick Mode**: Dark theme, auto-advances after 3 seconds, minimal explanations
+- **Standard Mode**: Full explanations, manual "Next Question" button
+- **Calm Mode**: Soothing colors, gentle prompts, encouraging messages
 
-You can see how components are registered with tambo in `src/lib/tambo.ts`:
+### AI-Powered Analysis
 
-```tsx
-export const components: TamboComponent[] = [
-  {
-    name: "Graph",
-    description:
-      "A component that renders various types of charts (bar, line, pie) using Recharts. Supports customizable data visualization with labels, datasets, and styling options.",
-    component: Graph,
-    propsSchema: graphSchema,
-  },
-  // Add more components here
-];
+AdaptIQ uses Claude AI for intelligent analysis:
+
+| Tool | Purpose |
+|------|---------|
+| `classifyMistakeAI` | Understands WHY you got it wrong (conceptual vs calculation vs careless) |
+| `detectPanicLevelAI` | Reads emotional state from natural language |
+| `generateEncouragementAI` | Personalized, empathetic encouragement |
+| `analyzeStudyPatternAI` | Learning coach insights and recommendations |
+
+## Tech Stack
+
+- **Next.js 15** with App Router
+- **Tambo AI SDK** for Generative UI
+- **Anthropic Claude** for AI analysis
+- **Framer Motion** for animations
+- **Tailwind CSS v4** for styling
+- **Zod** for schema validation
+- **TypeScript** strict mode
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── api/analyze/     # AI analysis endpoint
+│   ├── chat/            # Main chat interface
+│   └── page.tsx         # Landing page
+├── components/
+│   └── adaptiq/         # AdaptIQ components
+│       ├── PracticeSession.tsx
+│       ├── QuestionCard.tsx
+│       ├── MoodCheckIn.tsx
+│       ├── ProgressCard.tsx
+│       ├── CalmMode.tsx
+│       ├── ExamPanicMode.tsx
+│       └── MistakeAnalysis.tsx
+├── data/
+│   └── questions.ts     # 50 real JEE questions
+├── hooks/
+│   └── useUserProgress.ts
+├── lib/
+│   └── tambo.ts         # Component & tool registration
+├── types/
+│   └── index.ts         # TypeScript definitions
+└── utils/
+    ├── parseUserInput.ts
+    └── aiAnalysis.ts    # AI client utilities
 ```
 
-You can install the graph component into any project with:
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+- Tambo API key ([get one free](https://tambo.co/dashboard))
+- Anthropic API key ([get one here](https://console.anthropic.com/))
+
+### Installation
 
 ```bash
-npx tambo add graph
+# Clone the repository
+git clone <your-repo-url>
+cd adaptiq
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp example.env.local .env.local
 ```
 
-The example Graph component demonstrates several key features:
+Edit `.env.local`:
 
-- Different prop types (strings, arrays, enums, nested objects)
-- Multiple chart types (bar, line, pie)
-- Customizable styling (variants, sizes)
-- Optional configurations (title, legend, colors)
-- Data visualization capabilities
-
-Update the `components` array with any component(s) you want tambo to be able to use in a response!
-
-You can find more information about the options [here](https://docs.tambo.co/concepts/generative-interfaces/generative-components)
-
-### Add tools for tambo to use
-
-Tools are defined with `inputSchema` and `outputSchema`:
-
-```tsx
-export const tools: TamboTool[] = [
-  {
-    name: "globalPopulation",
-    description:
-      "A tool to get global population trends with optional year range filtering",
-    tool: getGlobalPopulationTrend,
-    inputSchema: z.object({
-      startYear: z.number().optional(),
-      endYear: z.number().optional(),
-    }),
-    outputSchema: z.array(
-      z.object({
-        year: z.number(),
-        population: z.number(),
-        growthRate: z.number(),
-      }),
-    ),
-  },
-];
+```env
+NEXT_PUBLIC_TAMBO_API_KEY=your_tambo_key
+ANTHROPIC_API_KEY=your_anthropic_key
 ```
 
-Find more information about tools [here.](https://docs.tambo.co/concepts/tools)
+### Run Development Server
 
-### The Magic of Tambo Requires the TamboProvider
-
-Make sure in the TamboProvider wrapped around your app:
-
-```tsx
-...
-<TamboProvider
-  apiKey={process.env.NEXT_PUBLIC_TAMBO_API_KEY!}
-  components={components} // Array of components to control
-  tools={tools} // Array of tools it can use
->
-  {children}
-</TamboProvider>
+```bash
+npm run dev
 ```
 
-In this example we do this in the `Layout.tsx` file, but you can do it anywhere in your app that is a client component.
+Visit [http://localhost:3000](http://localhost:3000)
 
-### Voice input
+## Usage Examples
 
-The template includes a `DictationButton` component using the `useTamboVoice` hook for speech-to-text input.
+Try these prompts in the chat:
 
-### MCP (Model Context Protocol)
+| Prompt | What Happens |
+|--------|--------------|
+| "I have 10 minutes, give me some quick physics practice" | Quick mode session with physics questions |
+| "I'm stressed about chemistry" | CalmMode with encouragement + easy practice |
+| "My JEE is tomorrow and I'm freaking out" | ExamPanicMode with emergency support |
+| "Why did I get that wrong?" | MistakeAnalysis with AI-powered explanation |
+| "How am I doing?" | ProgressCard with stats and insights |
+| "Practice 5 math questions" | Standard PracticeSession |
 
-The template includes MCP support for connecting to external tools and resources. You can use the MCP hooks from `@tambo-ai/react/mcp`:
+## How Tambo Works
 
-- `useTamboMcpPromptList` - List available prompts from MCP servers
-- `useTamboMcpPrompt` - Get a specific prompt
-- `useTamboMcpResourceList` - List available resources
+AdaptIQ uses Tambo's Generative UI to let AI decide which component to render:
 
-See `src/components/tambo/mcp-components.tsx` for example usage.
-
-### Change where component responses are shown
-
-The components used by tambo are shown alongside the message response from tambo within the chat thread, but you can have the result components show wherever you like by accessing the latest thread message's `renderedComponent` field:
-
-```tsx
-const { thread } = useTambo();
-const latestComponent =
-  thread?.messages[thread.messages.length - 1]?.renderedComponent;
-
-return (
-  <div>
-    {latestComponent && (
-      <div className="my-custom-wrapper">{latestComponent}</div>
-    )}
-  </div>
-);
+```typescript
+// Components are registered with descriptions
+{
+  name: 'ExamPanicMode',
+  description: `CRITICAL: Emergency intervention for pre-exam panic...
+    WHEN TO USE: User mentions exam tomorrow, expresses panic...`,
+  component: ExamPanicMode,
+  propsSchema: examPanicModeSchema,
+}
 ```
 
-For more detailed documentation, visit [Tambo's official docs](https://docs.tambo.co).
+The AI reads these descriptions and decides:
+1. Which component fits the user's context
+2. What props to generate
+3. Which tools to call for data
+
+## Architecture Decisions
+
+### Why Generative UI?
+
+Traditional chatbots return text. AdaptIQ returns **experiences**. When a student panics, they don't need a paragraph—they need a breathing exercise, a countdown, and a plan.
+
+### Why AI-Powered Analysis?
+
+Heuristic rules can't understand "I'm going to blank out tomorrow." Claude can detect the panic, identify triggers, and suggest the right intervention.
+
+### Why Mode-Dependent Behavior?
+
+Time-constrained students abandon apps that make them wait. Quick mode auto-advances. Calm mode never rushes. Same questions, different experiences.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## License
+
+MIT
+
+## Acknowledgments
+
+- Built with [Tambo AI](https://tambo.co)
+- Real JEE questions from public past papers
+
+---
+
+**Built for the Tambo "UI Strikes Back" Hackathon**

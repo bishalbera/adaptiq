@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ApiKeyCheckProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const ApiKeyMissingAlert = () => (
@@ -83,6 +83,25 @@ const CopyButton = ({ text }: { text: string }) => {
 
 export function ApiKeyCheck({ children }: ApiKeyCheckProps) {
   const isApiKeyMissing = !process.env.NEXT_PUBLIC_TAMBO_API_KEY;
+  const isDev = process.env.NODE_ENV === "development";
+
+  const initializedContent =
+    children ??
+    (isDev ? (
+      <p className="mt-2 text-sm text-gray-600">
+        Tambo is initialized. Render your app content as children of
+        <code className="bg-gray-100 px-1 py-0.5 rounded ml-1">ApiKeyCheck</code>
+        .
+      </p>
+    ) : null);
+
+  useEffect(() => {
+    if (!isApiKeyMissing && children === undefined && isDev) {
+      console.warn(
+        "ApiKeyCheck mounted without children while Tambo is initialized.",
+      );
+    }
+  }, [children, isApiKeyMissing, isDev]);
 
   return (
     <div className="flex items-start gap-4">
@@ -94,7 +113,7 @@ export function ApiKeyCheck({ children }: ApiKeyCheckProps) {
           </p>
         </div>
         {isApiKeyMissing && <ApiKeyMissingAlert />}
-        {!isApiKeyMissing && children}
+        {!isApiKeyMissing && initializedContent}
       </div>
     </div>
   );

@@ -164,3 +164,34 @@ Animated gradient for thinking text, creates a shimmering effect that moves acro
   -webkit-text-fill-color: transparent;
   animation: thinking-gradient 2s linear infinite;
 }
+
+@layer utilities {
+  .adaptiq-hero-bg {
+    background:
+      radial-gradient(
+        40vmin circle at 0% 0%,
+        rgba(59, 130, 246, 0.22),
+        transparent 55%
+      ),
+      radial-gradient(
+        40vmin circle at 100% 0%,
+        rgba(168, 85, 247, 0.18),
+        transparent 55%
+      ),
+      radial-gradient(
+        35vmin circle at 50% 120%,
+        rgba(16, 185, 129, 0.1),
+        transparent 55%
+      );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .adaptiq-hero-bg {
+      background: radial-gradient(
+        30vmin circle at 0% 0%,
+        rgba(59, 130, 246, 0.18),
+        transparent 55%
+      );
+    }
+  }
+}

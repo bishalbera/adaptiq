@@ -3,50 +3,59 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { getQuestionStats } from "@/data/questions";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export default function Home() {
   const stats = getQuestionStats();
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-background text-foreground">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 opacity-60 dark:opacity-70 adaptiq-hero-bg max-md:hidden"
+      />
       {/* Header */}
-      <header className="p-6">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Adapt<span className="text-blue-600">IQ</span>
+      <header className="relative p-6">
+        <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-bold">
+            Adapt<span className="text-blue-500">IQ</span>
           </h1>
-          <Link
-            href="/chat"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Start Practice
-          </Link>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Link
+              href="/chat"
+              className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Start practicing
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <main className="max-w-4xl mx-auto px-6 py-16">
+      <main className="relative max-w-4xl mx-auto px-6 py-16">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h2 className="text-5xl font-bold text-gray-900 mb-6">
-            JEE Prep That
+          <h2 className="text-5xl font-bold mb-6">
+            Exam prep that
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-              Adapts To You
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">
+              adapts to you
             </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
-            An AI-powered exam prep app that transforms based on your time,
-            mood, and stress level. Because everyone learns differently.
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            An AI-powered study companion that reshapes the interface based on
+            your time, focus, and stress level. JEE-style practice is included,
+            but the product story stays broader.
           </p>
           <Link
             href="/chat"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white text-lg rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/30"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground text-lg hover:bg-primary/90 transition-colors shadow-lg shadow-black/10 dark:shadow-black/40"
           >
-            Start Practicing
+            Start practicing
             <svg
               className="w-5 h-5"
               fill="none"
@@ -87,11 +96,15 @@ export default function Home() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100"
+          className="bg-card rounded-2xl p-8 shadow-sm border border-border"
         >
-          <h3 className="text-center text-gray-500 mb-6">
-            Question Bank Stats
+          <h3 className="text-center text-muted-foreground mb-6">
+            Built-in question bank
           </h3>
+          <p className="text-center text-muted-foreground/80 mb-6 text-sm">
+            Today we ship a Physics / Chemistry / Math starter pack inspired by
+            JEE-style problems. More exam packs can plug in later.
+          </p>
           <div className="grid grid-cols-4 gap-4 text-center">
             <StatBox label="Total Questions" value={stats.total} />
             <StatBox
@@ -114,9 +127,7 @@ export default function Home() {
 
         {/* How It Works */}
         <div className="mt-16">
-          <h3 className="text-2xl font-bold text-center text-gray-800 mb-8">
-            How It Works
-          </h3>
+          <h3 className="text-2xl font-bold text-center mb-8">How It Works</h3>
           <div className="space-y-4">
             <StepCard
               number={1}
@@ -138,16 +149,16 @@ export default function Home() {
 
         {/* CTA */}
         <div className="mt-16 text-center">
-          <p className="text-gray-500 mb-4">
+          <p className="text-muted-foreground mb-4">
             Built for the UI Strikes Back Hackathon
           </p>
-          <p className="text-gray-400 text-sm">
+          <p className="text-muted-foreground/80 text-sm">
             Powered by{" "}
             <a
               href="https://tambo.co"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-500 hover:underline"
+              className="text-blue-400 hover:underline"
             >
               Tambo AI
             </a>
@@ -172,11 +183,11 @@ function FeatureCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4 }}
-      className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
+      className="bg-card rounded-xl p-6 shadow-sm border border-border"
     >
       <div className="text-4xl mb-4">{emoji}</div>
-      <h3 className="text-lg font-semibold text-gray-800 mb-2">{title}</h3>
-      <p className="text-gray-600 text-sm">{description}</p>
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <p className="text-muted-foreground text-sm">{description}</p>
     </motion.div>
   );
 }
@@ -184,7 +195,7 @@ function FeatureCard({
 function StatBox({
   label,
   value,
-  color = "text-gray-800",
+  color = "text-foreground",
 }: {
   label: string;
   value: number;
@@ -193,7 +204,7 @@ function StatBox({
   return (
     <div>
       <p className={`text-3xl font-bold ${color}`}>{value}</p>
-      <p className="text-gray-500 text-sm">{label}</p>
+      <p className="text-muted-foreground text-sm">{label}</p>
     </div>
   );
 }
@@ -208,13 +219,13 @@ function StepCard({
   description: string;
 }) {
   return (
-    <div className="flex items-start gap-4 bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-      <div className="shrink-0 w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
+    <div className="flex items-start gap-4 bg-card rounded-xl p-4 shadow-sm border border-border">
+      <div className="shrink-0 w-10 h-10 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center font-bold">
         {number}
       </div>
       <div>
-        <h4 className="font-semibold text-gray-800">{title}</h4>
-        <p className="text-gray-600 text-sm">{description}</p>
+        <h4 className="font-semibold">{title}</h4>
+        <p className="text-muted-foreground text-sm">{description}</p>
       </div>
     </div>
   );

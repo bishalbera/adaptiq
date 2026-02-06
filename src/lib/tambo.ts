@@ -8,14 +8,17 @@
  * Read more about Tambo at https://tambo.co/docs
  */
 
+import { PracticeSession, practiceSessionSchema } from "@/components/adaptiq/PracticeSession";
+import { QuestionCard, questionCardSchema } from "@/components/adaptiq/QuestionCard";
 import { Graph, graphSchema } from "@/components/tambo/graph";
 import { DataCard, dataCardSchema } from "@/components/ui/card-data";
+import { getQuestions, getQuestionById, getQuestionStats } from "@/data/questions";
 import {
   getCountryPopulations,
   getGlobalPopulationTrend,
 } from "@/services/population-stats";
-import type { TamboComponent } from "@tambo-ai/react";
-import { TamboTool } from "@tambo-ai/react";
+import { analyzeUserInput } from "@/utils/parseUserInputs";
+import type { TamboComponent, TamboTool } from "@tambo-ai/react";
 import { z } from "zod";
 
 /**
@@ -28,50 +31,299 @@ import { z } from "zod";
 
 export const tools: TamboTool[] = [
   {
-    name: "countryPopulation",
-    description:
-      "A tool to get population statistics by country with advanced filtering options",
-    tool: getCountryPopulations,
-    inputSchema: z.object({
-      continent: z.string().optional(),
-      sortBy: z.enum(["population", "growthRate"]).optional(),
-      limit: z.number().optional(),
-      order: z.enum(["asc", "desc"]).optional(),
-    }),
-    outputSchema: z.array(
-      z.object({
-        countryCode: z.string(),
-        countryName: z.string(),
-        continent: z.enum([
-          "Asia",
-          "Africa",
-          "Europe",
-          "North America",
-          "South America",
-          "Oceania",
-        ]),
-        population: z.number(),
-        year: z.number(),
-        growthRate: z.number(),
-      }),
-    ),
+    name: "analyzeInput",
+    description: `Analyzes user's natural language input to extract:
+    - Time budget (quick/standard/deep) and exact minutes if mentioned
+    - Stress level (none/low/medium/high) from emotional keywords
+    - Subject/topic preferences
+
+    Use this when user mentions time constraints, emotional state, or topic preferences.
+    Examples: "I have 10 minutes", "I'm stressed about physics", "quick practice"`,
+    tool: (input: string) => analyzeUserInput(input),
+    toolSchema: z
+      .function()
+      .args(z.string().describe("User input text to analyze"))
+      .returns(
+        z.object({
+          time: z.object({
+            budget: z.enum(["quick", "standard", "deep"]),
+            minutes: z.number().nullable(),
+          }),
+          stress: z.enum(["none", "low", "medium", "high"]),
+          preferences: z.object({
+            subject: z.enum(["physics", "chemistry", "math"]).nullable(),
+            topics: z.array(z.string()),
+          }),
+        }),
+      ),
   },
   {
-    name: "globalPopulation",
-    description:
-      "A tool to get global population trends with optional year range filtering",
-    tool: getGlobalPopulationTrend,
-    inputSchema: z.object({
-      startYear: z.number().optional(),
-      endYear: z.number().optional(),
-    }),
-    outputSchema: z.array(
-      z.object({
-        year: z.number(),
-        population: z.number(),
-        growthRate: z.number(),
-      }),
-    ),
+    name: "getQuestions",
+    description: `Fetches practice questions from the question bank.
+    Can filter by subject (physics/chemistry/math), topic, difficulty (1-3).
+    Returns array of questions with id, text, options, correctAnswer, explanation.
+
+    Use this when user wants to practice or needs questions.
+    The limit parameter controls how many questions to return.`,
+    tool: (options?: {
+      subject?: "physics" | "chemistry" | "math";
+      topic?: string;
+      difficulty?: 1 | 2 | 3;
+      limit?: number;
+    }) => getQuestions(options),
+    toolSchema: z
+      .function()
+      .args(
+        z
+          .object({
+            subject: z.enum(["physics", "chemistry", "math"]).optional(),
+            topic: z.string().optional(),
+            difficulty: z.number().min(1).max(3).optional(),
+            limit: z.number().optional(),
+          })
+          .optional(),
+      )
+      .returns(
+        z.array(
+          z.object({
+            id: z.string(),
+            subject: z.enum(["physics", "chemistry", "math"]),
+            topic: z.string(),
+            subtopic: z.string(),
+            difficulty: z.number(),
+            text: z.string(),
+            options: z.object({
+              a: z.string(),
+              b: z.string(),
+              c: z.string(),
+              d: z.string(),
+            }),
+            correctAnswer: z.enum(["a", "b", "c", "d"]),
+            explanation: z.string(),
+            commonMistake: z.string().optional(),
+          }),
+        ),
+      ),
+  },
+  {
+    name: "getQuestionById",
+    description: `Fetches a specific question by its ID.
+    Use this when you need to show a particular question.`,
+    tool: (id: string) => getQuestionById(id),
+    toolSchema: z
+      .function()
+      .args(z.string().describe("Question ID"))
+      .returns(
+        z
+          .object({
+            id: z.string(),
+            subject: z.enum(["physics", "chemistry", "math"]),
+            topic: z.string(),
+            subtopic: z.string(),
+            difficulty: z.number(),
+            text: z.string(),
+            options: z.object({
+              a: z.string(),
+              b: z.string(),
+              c: z.string(),
+              d: z.string(),
+            }),
+            correctAnswer: z.enum(["a", "b", "c", "d"]),
+            explanation: z.string(),
+            commonMistake: z.string().optional(),
+          })
+          .optional(),
+      ),
+  },
+  {
+    name: "getQuestionStats",
+    description: `Returns statistics about the question bank:
+    - Total number of questions
+    - Count by subject (physics, chemistry, math)
+    - Count by difficulty (1, 2, 3)
+
+    Use this to inform user about available practice material.`,
+    tool: () => getQuestionStats(),
+    toolSchema: z
+      .function()
+      .args(z.void())
+      .returns(
+        z.object({
+          total: z.number(),
+          bySubject: z.object({
+            physics: z.number(),
+            chemistry: z.number(),
+            math: z.number(),
+          }),
+          byDifficulty: z.object({
+            1: z.number(),
+            2: z.number(),
+            3: z.number(),
+          }),
+        }),
+      ),
+  },
+  {
+    name: "classifyMistake",
+    description: `Classifies a mistake to help with MistakeAnalysis component.
+    Determines if the error was conceptual, calculation, careless, or misread.
+
+    Use this when rendering MistakeAnalysis to determine mistakeType.
+
+    Guidelines for classification:
+    - conceptual: User doesn't understand the underlying concept
+    - calculation: Math/arithmetic error (right approach, wrong numbers)
+    - careless: Rushed, didn't read options carefully
+    - misread: Misunderstood what question was asking`,
+    tool: (params: {
+      selectedAnswer: string;
+      correctAnswer: string;
+      topic: string;
+      questionType?: string;
+    }) => {
+      // Simple heuristic-based classification
+      // In production, this could be more sophisticated
+      const { topic } = params;
+
+      // Topics that are typically conceptual
+      const conceptualTopics = [
+        "Periodic Table",
+        "Atomic Structure",
+        "Chemical Bonding",
+        "Vectors",
+        "Circular Motion",
+      ];
+      // Topics that involve calculations
+      const calculationTopics = [
+        "Kinematics",
+        "Algebra",
+        "Calculus",
+        "Stoichiometry",
+        "Trigonometry",
+      ];
+
+      if (
+        conceptualTopics.some((t) =>
+          topic.toLowerCase().includes(t.toLowerCase()),
+        )
+      ) {
+        return { mistakeType: "conceptual" as const };
+      }
+      if (
+        calculationTopics.some((t) =>
+          topic.toLowerCase().includes(t.toLowerCase()),
+        )
+      ) {
+        return { mistakeType: "calculation" as const };
+      }
+
+      // Default to careless for others
+      return { mistakeType: "careless" as const };
+    },
+    toolSchema: z
+      .function()
+      .args(
+        z.object({
+          selectedAnswer: z.string(),
+          correctAnswer: z.string(),
+          topic: z.string(),
+          questionType: z.string().optional(),
+        }),
+      )
+      .returns(
+        z.object({
+          mistakeType: z.enum([
+            "conceptual",
+            "calculation",
+            "careless",
+            "misread",
+          ]),
+        }),
+      ),
+  },
+  {
+    name: "parseExamTiming",
+    description: `Parses user input to extract exam timing information.
+    Returns hours until exam and detected panic level.
+
+    Use this when user mentions:
+    - Exam timing: "exam tomorrow", "test in 2 days", "JEE next week"
+    - Time pressure: "only 3 hours left", "exam in the morning"
+    - Panic indicators: "not ready", "going to fail", "freaking out"
+
+    Returns hoursUntilExam and panicLevel to decide if ExamPanicMode is needed.`,
+    tool: (input: string) => {
+      const lower = input.toLowerCase();
+      let hoursUntilExam = 168; // Default: 1 week
+      let panicLevel: "low" | "medium" | "high" | "extreme" = "low";
+
+      // Parse timing
+      if (
+        lower.includes("today") ||
+        lower.includes("in a few hours") ||
+        /in \d+ hours?/.test(lower)
+      ) {
+        const hourMatch = lower.match(/in (\d+) hours?/);
+        hoursUntilExam = hourMatch ? parseInt(hourMatch[1]) : 4;
+      } else if (
+        lower.includes("tomorrow") ||
+        lower.includes("in the morning")
+      ) {
+        hoursUntilExam = 12;
+      } else if (lower.includes("day after") || /in 2 days?/.test(lower)) {
+        hoursUntilExam = 48;
+      } else if (/in (\d+) days?/.test(lower)) {
+        const dayMatch = lower.match(/in (\d+) days?/);
+        hoursUntilExam = dayMatch ? parseInt(dayMatch[1]) * 24 : 72;
+      } else if (lower.includes("next week") || lower.includes("this week")) {
+        hoursUntilExam = 120;
+      }
+
+      // Detect panic level
+      const extremePanic = [
+        "going to fail",
+        "not ready",
+        "can't do this",
+        "freaking out",
+        "panicking",
+        "blank out",
+        "meltdown",
+      ];
+      const highPanic = ["stressed", "anxious", "worried", "scared", "nervous"];
+      const mediumPanic = ["unsure", "not confident", "need help"];
+
+      if (extremePanic.some((p) => lower.includes(p))) {
+        panicLevel = "extreme";
+      } else if (highPanic.some((p) => lower.includes(p))) {
+        panicLevel = "high";
+      } else if (mediumPanic.some((p) => lower.includes(p))) {
+        panicLevel = "medium";
+      }
+
+      // Escalate if exam is very close
+      if (hoursUntilExam <= 6 && panicLevel !== "extreme") {
+        panicLevel = panicLevel === "low" ? "medium" : "high";
+      }
+
+      return {
+        hoursUntilExam,
+        panicLevel,
+        needsExamPanicMode:
+          panicLevel === "high" ||
+          panicLevel === "extreme" ||
+          hoursUntilExam <= 24,
+      };
+    },
+    toolSchema: z
+      .function()
+      .args(z.string().describe("User input to parse for exam timing"))
+      .returns(
+        z.object({
+          hoursUntilExam: z.number(),
+          panicLevel: z.enum(["low", "medium", "high", "extreme"]),
+          needsExamPanicMode: z.boolean(),
+        }),
+      ),
   },
   // Add more tools here
 ];
@@ -85,18 +337,155 @@ export const tools: TamboTool[] = [
  */
 export const components: TamboComponent[] = [
   {
-    name: "Graph",
-    description:
-      "A component that renders various types of charts (bar, line, pie) using Recharts. Supports customizable data visualization with labels, datasets, and styling options.",
-    component: Graph,
-    propsSchema: graphSchema,
+    name: "PracticeSession",
+    description: `PREFERRED for practice: A complete practice session with multiple questions.
+    Manages question flow, scoring, and navigation automatically.
+    Has MODE-DEPENDENT behavior for advancing between questions.
+
+    WHEN TO USE (USE THIS instead of QuestionCard for practice):
+    - User wants to practice multiple questions
+    - User mentions time constraints ("I have 10 minutes")
+    - User asks for a quiz or practice session
+    - User wants to practice a specific subject/topic
+
+    MODES:
+    - quick: Dark theme, AUTO-ADVANCES after 3 seconds, minimal explanations (for time-constrained)
+    - standard: Normal display, shows "Next Question" button, full explanations
+    - calm: Soothing colors, gentle "Ready for another?" button, encouraging
+
+    HOW TO USE:
+    1. Call getQuestions tool to fetch questions (use limit parameter, e.g., limit: 5)
+    2. Render PracticeSession with the questions array
+    3. Set mode based on user's time/stress: quick for <15min, calm if stressed, standard otherwise
+
+    REQUIRED PROPS: questions (array from getQuestions tool)
+    OPTIONAL: mode, showProgress`,
+    component: PracticeSession,
+    propsSchema: practiceSessionSchema,
   },
   {
-    name: "DataCard",
-    description:
-      "A component that displays options as clickable cards with links and summaries with the ability to select multiple items.",
-    component: DataCard,
-    propsSchema: dataCardSchema,
+    name: "QuestionCard",
+    description: `Displays a SINGLE practice question. Use PracticeSession instead for multiple questions.
+    Only use QuestionCard when showing exactly ONE question without session flow.
+
+    WHEN TO USE:
+    - Showing a single example question
+    - User asks for just one question specifically
+    - NOT for practice sessions (use PracticeSession instead)
+
+    MODES:
+    - standard: Normal display with full feedback
+    - quick: Dark theme for time-constrained practice
+    - calm: Soothing colors for stressed users`,
+    component: QuestionCard,
+    propsSchema: questionCardSchema,
+  },
+  {
+    name: "MoodCheckIn",
+    description: `Simple emoji mood picker (😫 Rough → 😊 Great) that affects session difficulty.
+
+    WHEN TO USE:
+    - At the start of a session
+    - When user seems unsure about difficulty
+    - Before practice begins
+    - User explicitly asks to set their mood
+
+    EFFECT: Lower moods get easier questions, higher moods get harder questions.`,
+    component: MoodCheckIn,
+    propsSchema: moodCheckInSchema,
+  },
+  {
+    name: "ProgressCard",
+    description: `Displays user's learning statistics and progress.
+    Shows accuracy percentage, questions attempted, streak, strong/weak topics.
+
+    WHEN TO USE:
+    - User asks about their progress or stats
+    - At start of session to show where they stand
+    - User asks "how am I doing?"
+
+    VARIANTS:
+    - default: Full stats with circular progress chart
+    - compact: Single-line summary bar
+    - calm: Soothing colors focusing on accomplishments (for stressed users)`,
+    component: ProgressCard,
+    propsSchema: progressCardSchema,
+  },
+  {
+    name: "CalmMode",
+    description: `CRITICAL: Supportive calming interface for stressed or overwhelmed users.
+    Transforms UI to be gentle and encouraging. Shows accomplishments, offers breaks.
+
+    WHEN TO USE (HIGH PRIORITY - render this FIRST if detected):
+    - User says: "can't do this", "giving up", "too hard", "failing", "hopeless"
+    - User expresses: frustration, anxiety, being overwhelmed, panic
+    - User mentions: crying, freaking out, meltdown, hate this
+    - Stress level detected as 'high' or 'medium' from analyzeInput tool
+
+    FEATURES:
+    - Soothing green/teal color scheme
+    - Shows user's accomplishments (problems solved, streak)
+    - Breathing exercise option
+    - Break timer
+    - "Easy wins" practice suggestion
+    - Option to continue normally
+
+    REQUIRED PROPS: totalSolved, currentStreak`,
+    component: CalmMode,
+    propsSchema: calmModeSchema,
+  },
+  {
+    name: "MistakeAnalysis",
+    description: `Detailed breakdown when user gets a question wrong.
+    Shows WHY they got it wrong, not just that they got it wrong.
+
+    WHEN TO USE:
+    - User just answered a question incorrectly
+    - User asks "why was I wrong?" or "explain my mistake"
+    - User wants to understand their error
+    - After incorrect answer in practice session (for deeper analysis)
+
+    FEATURES:
+    - Side-by-side comparison: Your Answer vs Correct Answer
+    - Explanation of why correct answer is correct
+    - Common mistake callout (why students typically get this wrong)
+    - Mistake type classification (conceptual, calculation, careless, misread)
+    - Pattern detection alert ("You've made this error 3 times")
+    - "Practice Similar Problems" button
+
+    REQUIRED PROPS: questionText, selectedAnswer, correctAnswer, options, explanation, topic, subject
+    OPTIONAL: commonMistake, mistakeType, similarMistakeCount, patternMessage`,
+    component: MistakeAnalysis,
+    propsSchema: mistakeAnalysisSchema,
+  },
+  {
+    name: "ExamPanicMode",
+    description: `CRITICAL: Emergency intervention for pre-exam panic and extreme anxiety.
+    More intensive than CalmMode - specifically for imminent exams with high stress.
+
+    WHEN TO USE (HIGHEST PRIORITY - render IMMEDIATELY if detected):
+    - User mentions exam is tomorrow/today/in X hours
+    - User expresses panic: "I'm going to fail", "not ready", "can't do this"
+    - User mentions: "exam tomorrow", "test in X hours", "freaking out about exam"
+    - User says: "going to blank out", "haven't studied enough", "no time left"
+    - Extreme stress with imminent deadline detected
+
+    DIFFERENCE FROM CalmMode:
+    - CalmMode: General stress relief during practice
+    - ExamPanicMode: Pre-exam crisis intervention with countdown, action plan, tips
+
+    FEATURES:
+    - Exam countdown with calming perspective
+    - Tabbed interface: Calm Down / You Got This / Action Plan / Exam Tips
+    - Guided breathing exercise (visual, timed)
+    - Confidence boosters showing user's accomplishments
+    - Emergency study plan based on time remaining
+    - Last-minute exam strategy tips
+
+    REQUIRED PROPS: hoursUntilExam, totalSolved, accuracy
+    OPTIONAL: examName, userName, strongTopics, weakTopics, bestMockScore`,
+    component: ExamPanicMode,
+    propsSchema: examPanicModeSchema,
   },
   // Add more components here
 ];

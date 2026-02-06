@@ -16,7 +16,6 @@ Traditional exam prep apps treat every student the same. But a student with 10 m
 |-----------|---------------|--------------|
 | **PracticeSession** | User wants to practice | Multi-question flow with mode-dependent behavior |
 | **QuestionCard** | Single question needed | Displays one question with instant feedback |
-| **MoodCheckIn** | Session start | Emoji picker that adjusts difficulty |
 | **ProgressCard** | User asks about progress | Stats, streaks, strong/weak topics |
 | **CalmMode** | Stress detected | Soothing UI, breathing exercises, accomplishments |
 | **ExamPanicMode** | Pre-exam crisis | Emergency intervention with countdown, tips, action plan |
@@ -61,7 +60,6 @@ src/
 │   └── adaptiq/         # AdaptIQ components
 │       ├── PracticeSession.tsx
 │       ├── QuestionCard.tsx
-│       ├── MoodCheckIn.tsx
 │       ├── ProgressCard.tsx
 │       ├── CalmMode.tsx
 │       ├── ExamPanicMode.tsx

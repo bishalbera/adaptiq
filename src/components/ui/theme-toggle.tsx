@@ -3,26 +3,32 @@
 import { cn } from "@/lib/utils";
 import { THEME_STORAGE_KEY, type ThemePreference } from "@/lib/theme";
 import { Moon, Sun } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function readThemeFromDom(): ThemePreference {
+  if (typeof document === "undefined") {
+    return "dark";
+  }
   return document.documentElement.classList.contains("dark") ? "dark" : "light";
 }
 
 function writeThemeToDom(theme: ThemePreference) {
+  if (typeof document === "undefined") {
+    return;
+  }
   document.documentElement.classList.toggle("dark", theme === "dark");
 }
 
 function persistTheme(theme: ThemePreference) {
-  localStorage.setItem(THEME_STORAGE_KEY, theme);
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch {
+    // Ignore.
+  }
 }
 
 export function ThemeToggle({ className }: { className?: string }) {
-  const [theme, setTheme] = useState<ThemePreference>("dark");
-
-  useEffect(() => {
-    setTheme(readThemeFromDom());
-  }, []);
+  const [theme, setTheme] = useState<ThemePreference>(() => readThemeFromDom());
 
   const nextTheme: ThemePreference = theme === "dark" ? "light" : "dark";
 

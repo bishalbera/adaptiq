@@ -101,7 +101,7 @@ export function ApiKeyCheck({ children }: ApiKeyCheckProps) {
         "ApiKeyCheck mounted without children while Tambo is initialized.",
       );
     }
-  }, [children, isApiKeyMissing, isDev]);
+  }, [children, isApiKeyMissing]);
 
   return (
     <div className="flex items-start gap-4">

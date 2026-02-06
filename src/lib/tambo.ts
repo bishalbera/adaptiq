@@ -10,13 +10,14 @@
 
 import { PracticeSession, practiceSessionSchema } from "@/components/adaptiq/PracticeSession";
 import { QuestionCard, questionCardSchema } from "@/components/adaptiq/QuestionCard";
-import { Graph, graphSchema } from "@/components/tambo/graph";
-import { DataCard, dataCardSchema } from "@/components/ui/card-data";
-import { getQuestions, getQuestionById, getQuestionStats } from "@/data/questions";
+import { CalmMode, calmModeSchema } from "@/components/adaptiq/CalmMode";
+import { ExamPanicMode, examPanicModeSchema } from "@/components/adaptiq/ExamPanicMode";
 import {
-  getCountryPopulations,
-  getGlobalPopulationTrend,
-} from "@/services/population-stats";
+  MistakeAnalysis,
+  mistakeAnalysisSchema,
+} from "@/components/adaptiq/MistakeAnalysis";
+import { ProgressCard, progressCardSchema } from "@/components/adaptiq/ProgressCard";
+import { getQuestions, getQuestionById, getQuestionStats } from "@/data/questions";
 import { analyzeUserInput } from "@/utils/parseUserInputs";
 import type { TamboComponent, TamboTool } from "@tambo-ai/react";
 import { z } from "zod";
@@ -40,22 +41,18 @@ export const tools: TamboTool[] = [
     Use this when user mentions time constraints, emotional state, or topic preferences.
     Examples: "I have 10 minutes", "I'm stressed about physics", "quick practice"`,
     tool: (input: string) => analyzeUserInput(input),
-    toolSchema: z
-      .function()
-      .args(z.string().describe("User input text to analyze"))
-      .returns(
-        z.object({
-          time: z.object({
-            budget: z.enum(["quick", "standard", "deep"]),
-            minutes: z.number().nullable(),
-          }),
-          stress: z.enum(["none", "low", "medium", "high"]),
-          preferences: z.object({
-            subject: z.enum(["physics", "chemistry", "math"]).nullable(),
-            topics: z.array(z.string()),
-          }),
-        }),
-      ),
+    inputSchema: z.string().describe("User input text to analyze"),
+    outputSchema: z.object({
+      time: z.object({
+        budget: z.enum(["quick", "standard", "deep"]),
+        minutes: z.number().nullable(),
+      }),
+      stress: z.enum(["none", "low", "medium", "high"]),
+      preferences: z.object({
+        subject: z.enum(["physics", "chemistry", "math"]).nullable(),
+        topics: z.array(z.string()),
+      }),
+    }),
   },
   {
     name: "getQuestions",
@@ -71,69 +68,59 @@ export const tools: TamboTool[] = [
       difficulty?: 1 | 2 | 3;
       limit?: number;
     }) => getQuestions(options),
-    toolSchema: z
-      .function()
-      .args(
-        z
-          .object({
-            subject: z.enum(["physics", "chemistry", "math"]).optional(),
-            topic: z.string().optional(),
-            difficulty: z.number().min(1).max(3).optional(),
-            limit: z.number().optional(),
-          })
-          .optional(),
-      )
-      .returns(
-        z.array(
-          z.object({
-            id: z.string(),
-            subject: z.enum(["physics", "chemistry", "math"]),
-            topic: z.string(),
-            subtopic: z.string(),
-            difficulty: z.number(),
-            text: z.string(),
-            options: z.object({
-              a: z.string(),
-              b: z.string(),
-              c: z.string(),
-              d: z.string(),
-            }),
-            correctAnswer: z.enum(["a", "b", "c", "d"]),
-            explanation: z.string(),
-            commonMistake: z.string().optional(),
-          }),
-        ),
-      ),
+    inputSchema: z
+      .object({
+        subject: z.enum(["physics", "chemistry", "math"]).optional(),
+        topic: z.string().optional(),
+        difficulty: z.number().min(1).max(3).optional(),
+        limit: z.number().optional(),
+      })
+      .optional(),
+    outputSchema: z.array(
+      z.object({
+        id: z.string(),
+        subject: z.enum(["physics", "chemistry", "math"]),
+        topic: z.string(),
+        subtopic: z.string(),
+        difficulty: z.number(),
+        text: z.string(),
+        options: z.object({
+          a: z.string(),
+          b: z.string(),
+          c: z.string(),
+          d: z.string(),
+        }),
+        correctAnswer: z.enum(["a", "b", "c", "d"]),
+        explanation: z.string(),
+        commonMistake: z.string().optional(),
+      }),
+    ),
   },
   {
     name: "getQuestionById",
     description: `Fetches a specific question by its ID.
     Use this when you need to show a particular question.`,
     tool: (id: string) => getQuestionById(id),
-    toolSchema: z
-      .function()
-      .args(z.string().describe("Question ID"))
-      .returns(
-        z
-          .object({
-            id: z.string(),
-            subject: z.enum(["physics", "chemistry", "math"]),
-            topic: z.string(),
-            subtopic: z.string(),
-            difficulty: z.number(),
-            text: z.string(),
-            options: z.object({
-              a: z.string(),
-              b: z.string(),
-              c: z.string(),
-              d: z.string(),
-            }),
-            correctAnswer: z.enum(["a", "b", "c", "d"]),
-            explanation: z.string(),
-            commonMistake: z.string().optional(),
-          })
-          .optional(),
-      ),
+    inputSchema: z.string().describe("Question ID"),
+    outputSchema: z
+      .object({
+        id: z.string(),
+        subject: z.enum(["physics", "chemistry", "math"]),
+        topic: z.string(),
+        subtopic: z.string(),
+        difficulty: z.number(),
+        text: z.string(),
+        options: z.object({
+          a: z.string(),
+          b: z.string(),
+          c: z.string(),
+          d: z.string(),
+        }),
+        correctAnswer: z.enum(["a", "b", "c", "d"]),
+        explanation: z.string(),
+        commonMistake: z.string().optional(),
+      })
+      .optional(),
   },
   {
     name: "getQuestionStats",
@@ -144,24 +131,20 @@ export const tools: TamboTool[] = [
 
     Use this to inform user about available practice material.`,
     tool: () => getQuestionStats(),
-    toolSchema: z
-      .function()
-      .args(z.void())
-      .returns(
-        z.object({
-          total: z.number(),
-          bySubject: z.object({
-            physics: z.number(),
-            chemistry: z.number(),
-            math: z.number(),
-          }),
-          byDifficulty: z.object({
-            1: z.number(),
-            2: z.number(),
-            3: z.number(),
-          }),
-        }),
-      ),
+    inputSchema: z.void(),
+    outputSchema: z.object({
+      total: z.number(),
+      bySubject: z.object({
+        physics: z.number(),
+        chemistry: z.number(),
+        math: z.number(),
+      }),
+      byDifficulty: z.object({
+        1: z.number(),
+        2: z.number(),
+        3: z.number(),
+      }),
+    }),
   },
   {
     name: "classifyMistake",
@@ -220,26 +203,20 @@ export const tools: TamboTool[] = [
       // Default to careless for others
       return { mistakeType: "careless" as const };
     },
-    toolSchema: z
-      .function()
-      .args(
-        z.object({
-          selectedAnswer: z.string(),
-          correctAnswer: z.string(),
-          topic: z.string(),
-          questionType: z.string().optional(),
-        }),
-      )
-      .returns(
-        z.object({
-          mistakeType: z.enum([
-            "conceptual",
-            "calculation",
-            "careless",
-            "misread",
-          ]),
-        }),
-      ),
+    inputSchema: z.object({
+      selectedAnswer: z.string(),
+      correctAnswer: z.string(),
+      topic: z.string(),
+      questionType: z.string().optional(),
+    }),
+    outputSchema: z.object({
+      mistakeType: z.enum([
+        "conceptual",
+        "calculation",
+        "careless",
+        "misread",
+      ]),
+    }),
   },
   {
     name: "parseExamTiming",
@@ -314,16 +291,12 @@ export const tools: TamboTool[] = [
           hoursUntilExam <= 24,
       };
     },
-    toolSchema: z
-      .function()
-      .args(z.string().describe("User input to parse for exam timing"))
-      .returns(
-        z.object({
-          hoursUntilExam: z.number(),
-          panicLevel: z.enum(["low", "medium", "high", "extreme"]),
-          needsExamPanicMode: z.boolean(),
-        }),
-      ),
+    inputSchema: z.string().describe("User input to parse for exam timing"),
+    outputSchema: z.object({
+      hoursUntilExam: z.number(),
+      panicLevel: z.enum(["low", "medium", "high", "extreme"]),
+      needsExamPanicMode: z.boolean(),
+    }),
   },
   // Add more tools here
 ];
@@ -379,20 +352,6 @@ export const components: TamboComponent[] = [
     - calm: Soothing colors for stressed users`,
     component: QuestionCard,
     propsSchema: questionCardSchema,
-  },
-  {
-    name: "MoodCheckIn",
-    description: `Simple emoji mood picker (😫 Rough → 😊 Great) that affects session difficulty.
-
-    WHEN TO USE:
-    - At the start of a session
-    - When user seems unsure about difficulty
-    - Before practice begins
-    - User explicitly asks to set their mood
-
-    EFFECT: Lower moods get easier questions, higher moods get harder questions.`,
-    component: MoodCheckIn,
-    propsSchema: moodCheckInSchema,
   },
   {
     name: "ProgressCard",

@@ -13,7 +13,7 @@ export default function ChatPage() {
       tamboUrl={process.env.NEXT_PUBLIC_TAMBO_URL}
     >
       <div className="h-screen">
-        <MessageThreadFull contextKey="adaptiq-main" />
+        <MessageThreadFull />
       </div>
     </TamboProvider>
   );

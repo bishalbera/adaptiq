@@ -147,67 +147,56 @@ export const tools: TamboTool[] = [
     }),
   },
   {
-    name: "classifyMistake",
-    description: `Classifies a mistake to help with MistakeAnalysis component.
-    Determines if the error was conceptual, calculation, careless, or misread.
+    name: "classifyMistakeAI",
+    description: `AI-POWERED: Deeply analyzes a student's mistake to understand WHY they got it wrong.
+    Uses Claude AI to examine the question, the student's answer, and the correct answer.
 
-    Use this when rendering MistakeAnalysis to determine mistakeType.
+    Returns:
+    - mistakeType: conceptual, calculation, careless, or misread
+    - explanation: Why they likely made this mistake
+    - tip: Specific actionable advice to avoid it
+    - encouragement: A supportive message
 
-    Guidelines for classification:
-    - conceptual: User doesn't understand the underlying concept
-    - calculation: Math/arithmetic error (right approach, wrong numbers)
-    - careless: Rushed, didn't read options carefully
-    - misread: Misunderstood what question was asking`,
-    tool: (params: {
-      selectedAnswer: string;
-      correctAnswer: string;
+    Use this when rendering MistakeAnalysis for intelligent feedback.`,
+    tool: async (params: {
+      questionText: string;
       topic: string;
-      questionType?: string;
+      subject: string;
+      selectedAnswer: string;
+      selectedOption: string;
+      correctAnswer: string;
+      correctOption: string;
+      explanation: string;
+      commonMistake?: string;
     }) => {
-      // Simple heuristic-based classification
-      // In production, this could be more sophisticated
-      const { topic } = params;
-
-      // Topics that are typically conceptual
-      const conceptualTopics = [
-        "Periodic Table",
-        "Atomic Structure",
-        "Chemical Bonding",
-        "Vectors",
-        "Circular Motion",
-      ];
-      // Topics that involve calculations
-      const calculationTopics = [
-        "Kinematics",
-        "Algebra",
-        "Calculus",
-        "Stoichiometry",
-        "Trigonometry",
-      ];
-
-      if (
-        conceptualTopics.some((t) =>
-          topic.toLowerCase().includes(t.toLowerCase()),
-        )
-      ) {
-        return { mistakeType: "conceptual" as const };
+      try {
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "classifyMistake", data: params }),
+        });
+        if (!response.ok) throw new Error("API call failed");
+        return await response.json();
+      } catch {
+        // Fallback to simple heuristic if AI fails
+        return {
+          mistakeType: "careless" as const,
+          explanation: "Review the question and options carefully.",
+          tip: "Take your time reading all options before selecting.",
+          encouragement: "Every mistake is a learning opportunity!",
+        };
       }
-      if (
-        calculationTopics.some((t) =>
-          topic.toLowerCase().includes(t.toLowerCase()),
-        )
-      ) {
-        return { mistakeType: "calculation" as const };
-      }
-
-      // Default to careless for others
-      return { mistakeType: "careless" as const };
     },
     inputSchema: z.object({
-      selectedAnswer: z.string(),
-      correctAnswer: z.string(),
+      questionText: z.string(),
       topic: z.string(),
-      questionType: z.string().optional(),
+      subject: z.string(),
+      selectedAnswer: z.string(),
+      selectedOption: z.string(),
+      correctAnswer: z.string(),
+      correctOption: z.string(),
+      explanation: z.string(),
+      commonMistake: z.string().optional(),
     }),
     outputSchema: z.object({
       mistakeType: z.enum([
@@ -216,19 +205,141 @@ export const tools: TamboTool[] = [
         "careless",
         "misread",
       ]),
+      explanation: z.string(),
+      tip: z.string(),
+      encouragement: z.string(),
+    }),
+  },
+  {
+    name: "generateEncouragementAI",
+    description: `AI-POWERED: Generates personalized, empathetic encouragement for the student.
+    Takes into account their mood, performance, progress, and stress level.
+
+    Use this when:
+    - Student is struggling or frustrated
+    - Rendering CalmMode or ExamPanicMode
+    - Student asks for motivation or help
+
+    Returns a personalized message and a suggested action.`,
+    tool: async (params: {
+      mood?: string;
+      accuracy: number;
+      totalSolved: number;
+      streak: number;
+      strongTopics?: string[];
+      weakTopics?: string[];
+      stressLevel?: string;
+      recentMistakes?: string;
+    }) => {
+      try {
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "generateEncouragement", data: params }),
+        });
+        if (!response.ok) throw new Error("API call failed");
+        return await response.json();
+      } catch {
+        return {
+          message: "You're making progress. Keep going!",
+          suggestedAction: "Try a few more practice questions.",
+        };
+      }
+    },
+    inputSchema: z.object({
+      mood: z.string().optional(),
+      accuracy: z.number(),
+      totalSolved: z.number(),
+      streak: z.number(),
+      strongTopics: z.array(z.string()).optional(),
+      weakTopics: z.array(z.string()).optional(),
+      stressLevel: z.string().optional(),
+      recentMistakes: z.string().optional(),
+    }),
+    outputSchema: z.object({
+      message: z.string(),
+      suggestedAction: z.string(),
+    }),
+  },
+  {
+    name: "detectPanicLevelAI",
+    description: `AI-POWERED: Analyzes user's message for stress, anxiety, and panic indicators.
+    Uses emotional intelligence to detect how the student is really feeling.
+
+    Use this when:
+    - User mentions exam timing with emotional language
+    - Deciding between CalmMode vs ExamPanicMode
+    - Student seems stressed but hasn't explicitly said so
+
+    Returns panic level, detected emotions, and recommended approach.`,
+    tool: async (params: {
+      message: string;
+      hoursUntilExam?: number;
+      accuracy?: number;
+      recentPerformance?: string;
+    }) => {
+      try {
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "detectPanicLevel", data: params }),
+        });
+        if (!response.ok) throw new Error("API call failed");
+        return await response.json();
+      } catch {
+        // Fallback to keyword-based detection
+        const lower = params.message.toLowerCase();
+        const highPanicWords = [
+          "fail",
+          "panic",
+          "can't",
+          "freaking",
+          "hopeless",
+          "give up",
+        ];
+        const panicLevel = highPanicWords.some((w) => lower.includes(w))
+          ? "high"
+          : "low";
+        return {
+          panicLevel,
+          detectedEmotions: [],
+          needsIntervention: panicLevel === "high",
+          suggestedApproach:
+            panicLevel === "high" ? "crisis-support" : "encouraging",
+          keyTriggers: [],
+        };
+      }
+    },
+    inputSchema: z.object({
+      message: z.string(),
+      hoursUntilExam: z.number().optional(),
+      accuracy: z.number().optional(),
+      recentPerformance: z.string().optional(),
+    }),
+    outputSchema: z.object({
+      panicLevel: z.enum(["none", "low", "medium", "high", "crisis"]),
+      detectedEmotions: z.array(z.string()),
+      needsIntervention: z.boolean(),
+      suggestedApproach: z.enum([
+        "calm",
+        "encouraging",
+        "practical",
+        "crisis-support",
+      ]),
+      keyTriggers: z.array(z.string()),
     }),
   },
   {
     name: "parseExamTiming",
-    description: `Parses user input to extract exam timing information.
-    Returns hours until exam and detected panic level.
+    description: `FAST utility for extracting exam timing from user input.
+    Uses simple pattern matching - for deep emotional analysis use detectPanicLevelAI instead.
 
-    Use this when user mentions:
-    - Exam timing: "exam tomorrow", "test in 2 days", "JEE next week"
-    - Time pressure: "only 3 hours left", "exam in the morning"
-    - Panic indicators: "not ready", "going to fail", "freaking out"
+    Use this for quick time extraction when user mentions:
+    - "exam tomorrow", "test in 2 days", "JEE next week"
+    - "in 3 hours", "this morning"
 
-    Returns hoursUntilExam and panicLevel to decide if ExamPanicMode is needed.`,
+    For emotional/panic analysis, use detectPanicLevelAI tool instead.
+    This tool is fast and works offline.`,
     tool: (input: string) => {
       const lower = input.toLowerCase();
       let hoursUntilExam = 168; // Default: 1 week
@@ -296,6 +407,64 @@ export const tools: TamboTool[] = [
       hoursUntilExam: z.number(),
       panicLevel: z.enum(["low", "medium", "high", "extreme"]),
       needsExamPanicMode: z.boolean(),
+    }),
+  },
+  {
+    name: "analyzeStudyPatternAI",
+    description: `AI-POWERED: Analyzes student's practice history to provide insights and recommendations.
+    Uses Claude AI to identify strengths, weaknesses, and personalized study strategies.
+
+    Use this when:
+    - Rendering ProgressCard with personalized insights
+    - User asks "how am I doing?" or "what should I focus on?"
+    - Building adaptive study recommendations
+
+    Returns strengths, areas to improve, recommended focus, and readiness estimate.`,
+    tool: async (params: {
+      totalAttempted: number;
+      accuracy: number;
+      totalMinutes: number;
+      topicBreakdown: Record<string, { attempted: number; correct: number }>;
+      mistakePatterns: Record<string, number>;
+      daysUntilExam?: number;
+    }) => {
+      try {
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "analyzeStudyPattern", data: params }),
+        });
+        if (!response.ok) throw new Error("API call failed");
+        return await response.json();
+      } catch {
+        return {
+          strengths: ["Consistent practice"],
+          areasToImprove: ["Continue reviewing weak topics"],
+          recommendedFocus: "Keep up the balanced practice",
+          studyTip: "Focus on understanding concepts deeply.",
+          estimatedReadiness: "medium" as const,
+        };
+      }
+    },
+    inputSchema: z.object({
+      totalAttempted: z.number(),
+      accuracy: z.number(),
+      totalMinutes: z.number(),
+      topicBreakdown: z.record(
+        z.object({
+          attempted: z.number(),
+          correct: z.number(),
+        }),
+      ),
+      mistakePatterns: z.record(z.number()),
+      daysUntilExam: z.number().optional(),
+    }),
+    outputSchema: z.object({
+      strengths: z.array(z.string()),
+      areasToImprove: z.array(z.string()),
+      recommendedFocus: z.string(),
+      studyTip: z.string(),
+      estimatedReadiness: z.enum(["low", "medium", "high"]),
     }),
   },
   // Add more tools here

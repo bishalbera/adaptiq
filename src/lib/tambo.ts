@@ -40,8 +40,10 @@ export const tools: TamboTool[] = [
 
     Use this when user mentions time constraints, emotional state, or topic preferences.
     Examples: "I have 10 minutes", "I'm stressed about physics", "quick practice"`,
-    tool: (input: string) => analyzeUserInput(input),
-    inputSchema: z.string().describe("User input text to analyze"),
+    tool: ({ input }: { input: string }) => analyzeUserInput(input),
+    inputSchema: z.object({
+      input: z.string().describe("User input text to analyze"),
+    }),
     outputSchema: z.object({
       time: z.object({
         budget: z.enum(["quick", "standard", "deep"]),
@@ -68,14 +70,12 @@ export const tools: TamboTool[] = [
       difficulty?: 1 | 2 | 3;
       limit?: number;
     }) => getQuestions(options),
-    inputSchema: z
-      .object({
-        subject: z.enum(["physics", "chemistry", "math"]).optional(),
-        topic: z.string().optional(),
-        difficulty: z.number().min(1).max(3).optional(),
-        limit: z.number().optional(),
-      })
-      .optional(),
+    inputSchema: z.object({
+      subject: z.enum(["physics", "chemistry", "math"]).optional(),
+      topic: z.string().optional(),
+      difficulty: z.number().min(1).max(3).optional(),
+      limit: z.number().optional(),
+    }),
     outputSchema: z.array(
       z.object({
         id: z.string(),
@@ -100,8 +100,10 @@ export const tools: TamboTool[] = [
     name: "getQuestionById",
     description: `Fetches a specific question by its ID.
     Use this when you need to show a particular question.`,
-    tool: (id: string) => getQuestionById(id),
-    inputSchema: z.string().describe("Question ID"),
+    tool: ({ id }: { id: string }) => getQuestionById(id),
+    inputSchema: z.object({
+      id: z.string().describe("Question ID"),
+    }),
     outputSchema: z
       .object({
         id: z.string(),
@@ -131,7 +133,7 @@ export const tools: TamboTool[] = [
 
     Use this to inform user about available practice material.`,
     tool: () => getQuestionStats(),
-    inputSchema: z.void(),
+    inputSchema: z.object({}),
     outputSchema: z.object({
       total: z.number(),
       bySubject: z.object({
@@ -340,7 +342,7 @@ export const tools: TamboTool[] = [
 
     For emotional/panic analysis, use detectPanicLevelAI tool instead.
     This tool is fast and works offline.`,
-    tool: (input: string) => {
+    tool: ({ input }: { input: string }) => {
       const lower = input.toLowerCase();
       let hoursUntilExam = 168; // Default: 1 week
       let panicLevel: "low" | "medium" | "high" | "extreme" = "low";
@@ -402,7 +404,9 @@ export const tools: TamboTool[] = [
           hoursUntilExam <= 24,
       };
     },
-    inputSchema: z.string().describe("User input to parse for exam timing"),
+    inputSchema: z.object({
+      input: z.string().describe("User input to parse for exam timing"),
+    }),
     outputSchema: z.object({
       hoursUntilExam: z.number(),
       panicLevel: z.enum(["low", "medium", "high", "extreme"]),
@@ -424,15 +428,20 @@ export const tools: TamboTool[] = [
       totalAttempted: number;
       accuracy: number;
       totalMinutes: number;
-      topicBreakdown: Record<string, { attempted: number; correct: number }>;
-      mistakePatterns: Record<string, number>;
+      topicBreakdown: string;
+      mistakePatterns: string;
       daysUntilExam?: number;
     }) => {
+      const parsedParams = {
+        ...params,
+        topicBreakdown: JSON.parse(params.topicBreakdown) as Record<string, { attempted: number; correct: number }>,
+        mistakePatterns: JSON.parse(params.mistakePatterns) as Record<string, number>,
+      };
       try {
         const response = await fetch("/api/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "analyzeStudyPattern", data: params }),
+          body: JSON.stringify({ type: "analyzeStudyPattern", data: parsedParams }),
         });
         if (!response.ok) throw new Error("API call failed");
         return await response.json();
@@ -450,13 +459,8 @@ export const tools: TamboTool[] = [
       totalAttempted: z.number(),
       accuracy: z.number(),
       totalMinutes: z.number(),
-      topicBreakdown: z.record(
-        z.object({
-          attempted: z.number(),
-          correct: z.number(),
-        }),
-      ),
-      mistakePatterns: z.record(z.number()),
+      topicBreakdown: z.string().describe("JSON string of Record<topic, { attempted: number, correct: number }>"),
+      mistakePatterns: z.string().describe("JSON string of Record<mistakeType, count>"),
       daysUntilExam: z.number().optional(),
     }),
     outputSchema: z.object({

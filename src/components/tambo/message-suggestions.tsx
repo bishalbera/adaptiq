@@ -261,7 +261,7 @@ const MessageSuggestionsStatus = React.forwardRef<
     >
       {/* Error state */}
       {error && (
-        <div className="p-2 rounded-md text-sm bg-red-50 text-red-500">
+        <div className="p-2 rounded-md text-sm bg-neon-error/10 text-neon-error">
           <p>{error.message}</p>
         </div>
       )}
@@ -379,7 +379,7 @@ const MessageSuggestionsList = React.forwardRef<
           placeholders.map((_, index) => (
             <div
               key={`placeholder-${index}`}
-              className="py-2 px-2.5 rounded-2xl text-xs border border-flat bg-muted/20 text-transparent animate-pulse"
+              className="py-2 px-2.5 rounded-2xl text-xs border border-white/5 glass text-transparent animate-pulse"
               data-placeholder-index={index}
             >
               <span className="invisible">Placeholder</span>
@@ -401,12 +401,12 @@ function getSuggestionButtonClassName({
   isSelected: boolean;
 }) {
   if (isGenerating) {
-    return "bg-muted/50 text-muted-foreground";
+    return "glass text-muted-foreground";
   }
   if (isSelected) {
-    return "bg-accent text-accent-foreground";
+    return "bg-neon-primary/15 text-neon-primary border-neon-primary/30";
   }
-  return "bg-background hover:bg-accent hover:text-accent-foreground";
+  return "glass hover:bg-neon-primary/10 hover:text-neon-primary hover:border-neon-primary/20";
 }
 
 export { MessageSuggestions, MessageSuggestionsList, MessageSuggestionsStatus };

@@ -42,7 +42,7 @@ const CircularProgress = ({
   percentage,
   size = 120,
   strokeWidth = 8,
-  color = "stroke-blue-500",
+  color = "stroke-neon-primary",
 }: {
   percentage: number;
   size?: number;
@@ -61,7 +61,7 @@ const CircularProgress = ({
           cy={size / 2}
           r={radius}
           strokeWidth={strokeWidth}
-          className="fill-none stroke-gray-200"
+          className="fill-none stroke-white/10"
         />
         <motion.circle
           cx={size / 2}
@@ -77,7 +77,7 @@ const CircularProgress = ({
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-2xl font-bold text-gray-800">{percentage}%</span>
+        <span className="text-2xl font-bold text-foreground">{percentage}%</span>
       </div>
     </div>
   );
@@ -87,7 +87,7 @@ const StatItem = ({
   label,
   value,
   icon,
-  color = "text-gray-800",
+  color = "text-foreground",
 }: {
   label: string;
   value: string | number;
@@ -99,7 +99,7 @@ const StatItem = ({
       <span className="text-2xl">{icon}</span>
       <div>
         <p className={cn("text-xl font-semibold", color)}>{value}</p>
-        <p className="text-sm text-gray-500">{label}</p>
+        <p className="text-sm text-muted-foreground">{label}</p>
       </div>
     </div>
   );
@@ -118,8 +118,8 @@ const TopicBadge = ({
 }) => {
   const color =
     type === "strong"
-      ? "bg-green-50 border-green-200 text-green-800"
-      : "bg-red-50 border-red-200 text-red-800";
+      ? "bg-neon-success/10 border-neon-success/20 text-neon-success"
+      : "bg-neon-error/10 border-neon-error/20 text-neon-error";
   return (
     <div className={cn("px-3 py-2 rounded-lg border text-sm", color)}>
       <span className="font-medium">{topic}</span>
@@ -151,10 +151,10 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
 
     const progressColor =
       accuracy >= 80
-        ? "stroke-green-500"
+        ? "stroke-neon-success"
         : accuracy >= 60
-          ? "stroke-yellow-500"
-          : "stroke-red-500";
+          ? "stroke-neon-warning"
+          : "stroke-neon-error";
 
     if (variant === "compact") {
       return (
@@ -162,27 +162,27 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
           ref={ref}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm"
+          className="glass rounded-lg p-4"
         >
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="text-center">
-                <p className="text-2xl font-bold text-gray-800">{accuracy}%</p>
-                <p className="text-xs text-gray-500">Accuracy</p>
+                <p className="text-2xl font-bold text-foreground">{accuracy}%</p>
+                <p className="text-xs text-muted-foreground">Accuracy</p>
               </div>
-              <div className="h-8 w-px bg-gray-200" />
+              <div className="h-8 w-px bg-white/10" />
               <div className="text-center">
-                <p className="text-2xl font-bold text-gray-800">
+                <p className="text-2xl font-bold text-foreground">
                   {totalAttempted}
                 </p>
-                <p className="text-xs text-gray-500">Attempted</p>
+                <p className="text-xs text-muted-foreground">Attempted</p>
               </div>
-              <div className="h-8 w-px bg-gray-200" />
+              <div className="h-8 w-px bg-white/10" />
               <div className="text-center">
-                <p className="text-2xl font-bold text-orange-500">
+                <p className="text-2xl font-bold text-neon-warning">
                   {currentStreak}🔥
                 </p>
-                <p className="text-xs text-gray-500">Day streak</p>
+                <p className="text-xs text-muted-foreground">Day streak</p>
               </div>
             </div>
           </div>
@@ -196,38 +196,38 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
           ref={ref}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border-2 border-emerald-200 p-6 shadow-sm"
+          className="bg-neon-success/5 backdrop-blur-xl rounded-xl border border-neon-success/20 p-6"
         >
           <div className="text-center mb-6">
-            <h3 className="text-xl font-semibold text-emerald-800 mb-2">
+            <h3 className="text-xl font-semibold text-neon-success mb-2">
               Look how far you&apos;ve come! 🌟
             </h3>
           </div>
 
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="text-center p-4 bg-white/50 rounded-lg">
-              <p className="text-3xl font-bold text-emerald-700">
+            <div className="text-center p-4 bg-neon-success/10 rounded-lg">
+              <p className="text-3xl font-bold text-neon-success text-glow-success">
                 {totalAttempted}
               </p>
-              <p className="text-sm text-emerald-600">Questions solved</p>
+              <p className="text-sm text-neon-success/70">Questions solved</p>
             </div>
-            <div className="text-center p-4 bg-white/50 rounded-lg">
-              <p className="text-3xl font-bold text-emerald-700">
+            <div className="text-center p-4 bg-neon-success/10 rounded-lg">
+              <p className="text-3xl font-bold text-neon-success text-glow-success">
                 {totalCorrect}
               </p>
-              <p className="text-sm text-emerald-600">Correct answers</p>
+              <p className="text-sm text-neon-success/70">Correct answers</p>
             </div>
-            <div className="text-center p-4 bg-white/50 rounded-lg">
-              <p className="text-3xl font-bold text-orange-500">
+            <div className="text-center p-4 bg-neon-warning/10 rounded-lg">
+              <p className="text-3xl font-bold text-neon-warning">
                 {currentStreak}🔥
               </p>
-              <p className="text-sm text-emerald-600">Day streak</p>
+              <p className="text-sm text-neon-success/70">Day streak</p>
             </div>
           </div>
 
           {strongTopics.length > 0 && (
-            <div className="bg-white/50 rounded-lg p-4">
-              <h4 className="font-medium text-emerald-800 mb-2">
+            <div className="glass rounded-lg p-4">
+              <h4 className="font-medium text-neon-success mb-2">
                 Your strengths 💪
               </h4>
               <div className="flex flex-wrap gap-2">
@@ -246,9 +246,9 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
         ref={ref}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl border-2 border-gray-100 p-6 shadow-sm"
+        className="glass rounded-xl p-6"
       >
-        <h3 className="text-lg font-semibold text-gray-800 mb-6">
+        <h3 className="text-lg font-semibold text-foreground mb-6">
           Your Progress
         </h3>
 
@@ -256,7 +256,7 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
           {/* Left: Circular progress */}
           <div className="flex flex-col items-center">
             <CircularProgress percentage={accuracy} color={progressColor} />
-            <p className="text-sm text-gray-500 mt-2">Overall Accuracy</p>
+            <p className="text-sm text-muted-foreground mt-2">Overall Accuracy</p>
           </div>
 
           {/* Right: Stats */}
@@ -270,20 +270,20 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
               label="Correct Answers"
               value={totalCorrect}
               icon="✅"
-              color="text-green-600"
+              color="text-neon-success"
             />
             <StatItem
               label="Day Streak"
               value={`${currentStreak} 🔥`}
               icon="📆"
-              color="text-orange-500"
+              color="text-neon-warning"
             />
             {daysUntilExam !== undefined && daysUntilExam !== null && (
               <StatItem
                 label="Days Until Exam"
                 value={daysUntilExam}
                 icon="🎯"
-                color={daysUntilExam <= 7 ? "text-red-600" : "text-blue-600"}
+                color={daysUntilExam <= 7 ? "text-neon-error" : "text-neon-primary"}
               />
             )}
           </div>
@@ -291,12 +291,12 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
 
         {/* Topics section */}
         {(strongTopics.length > 0 || weakTopics.length > 0) && (
-          <div className="mt-6 pt-6 border-t border-gray-100">
+          <div className="mt-6 pt-6 border-t border-white/10">
             <div className="grid md:grid-cols-2 gap-4">
               {/* Strong topics */}
               {strongTopics.length > 0 && (
                 <div>
-                  <h4 className="font-medium text-gray-700 mb-2">
+                  <h4 className="font-medium text-neon-success mb-2">
                     Strong Topics 💪
                   </h4>
                   <div className="flex flex-wrap gap-2">
@@ -310,7 +310,7 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
               {/* Weak topics */}
               {weakTopics.length > 0 && (
                 <div>
-                  <h4 className="font-medium text-gray-700 mb-2">
+                  <h4 className="font-medium text-neon-error mb-2">
                     Needs Practice 📚
                   </h4>
                   <div className="flex flex-wrap gap-2">

@@ -5,6 +5,20 @@ import { motion } from "framer-motion";
 import { getQuestionStats } from "@/data/questions";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 200, damping: 20 },
+  },
+};
+
 export default function Home() {
   const stats = getQuestionStats();
 
@@ -12,19 +26,20 @@ export default function Home() {
     <div className="min-h-screen bg-background text-foreground">
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 opacity-60 dark:opacity-70 adaptiq-hero-bg max-md:hidden"
+        className="pointer-events-none fixed inset-0 opacity-70 dark:opacity-80 adaptiq-hero-bg"
       />
+
       {/* Header */}
       <header className="relative p-6">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
           <h1 className="text-2xl font-bold">
-            Adapt<span className="text-blue-500">IQ</span>
+            Adapt<span className="text-neon-primary text-glow-primary">IQ</span>
           </h1>
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <Link
               href="/chat"
-              className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              className="px-4 py-2 rounded-lg bg-neon-primary/90 text-white hover:bg-neon-primary transition-all hover:glow-primary-sm"
             >
               Start practicing
             </Link>
@@ -42,7 +57,7 @@ export default function Home() {
           <h2 className="text-5xl font-bold mb-6">
             Exam prep that
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-primary to-neon-secondary">
               adapts to you
             </span>
           </h2>
@@ -53,11 +68,11 @@ export default function Home() {
           </p>
           <Link
             href="/chat"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-primary text-primary-foreground text-lg hover:bg-primary/90 transition-colors shadow-lg shadow-black/10 dark:shadow-black/40"
+            className="group inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-neon-primary text-white text-lg hover:bg-neon-primary/90 transition-all glow-primary-sm hover:glow-primary"
           >
             Start practicing
             <svg
-              className="w-5 h-5"
+              className="w-5 h-5 transition-transform group-hover:translate-x-1"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -73,7 +88,12 @@ export default function Home() {
         </motion.div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          animate="visible"
+          className="grid md:grid-cols-3 gap-6 mb-16"
+        >
           <FeatureCard
             emoji="⏱️"
             title="Time-Aware"
@@ -89,14 +109,14 @@ export default function Home() {
             title="Adaptive Difficulty"
             description="Questions adjust based on your mood and performance. Bad day? Easier questions."
           />
-        </div>
+        </motion.div>
 
         {/* Stats */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-card rounded-2xl p-8 shadow-sm border border-border"
+          transition={{ delay: 0.3 }}
+          className="glass rounded-2xl p-8"
         >
           <h3 className="text-center text-muted-foreground mb-6">
             Built-in question bank
@@ -110,17 +130,19 @@ export default function Home() {
             <StatBox
               label="Physics"
               value={stats.bySubject.physics}
-              color="text-blue-600"
+              color="text-neon-primary"
+              glow="text-glow-primary"
             />
             <StatBox
               label="Chemistry"
               value={stats.bySubject.chemistry}
-              color="text-purple-600"
+              color="text-neon-secondary"
+              glow="text-glow-secondary"
             />
             <StatBox
               label="Math"
               value={stats.bySubject.math}
-              color="text-orange-600"
+              color="text-neon-warning"
             />
           </div>
         </motion.div>
@@ -158,7 +180,7 @@ export default function Home() {
               href="https://tambo.co"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-400 hover:underline"
+              className="text-neon-primary hover:text-neon-primary/80 hover:underline transition-colors"
             >
               Tambo AI
             </a>
@@ -180,10 +202,9 @@ function FeatureCard({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
-      className="bg-card rounded-xl p-6 shadow-sm border border-border"
+      variants={fadeUp}
+      whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 20 } }}
+      className="glass rounded-xl p-6 hover:glow-primary-sm transition-shadow"
     >
       <div className="text-4xl mb-4">{emoji}</div>
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
@@ -196,14 +217,16 @@ function StatBox({
   label,
   value,
   color = "text-foreground",
+  glow = "",
 }: {
   label: string;
   value: number;
   color?: string;
+  glow?: string;
 }) {
   return (
     <div>
-      <p className={`text-3xl font-bold ${color}`}>{value}</p>
+      <p className={`text-3xl font-bold ${color} ${glow}`}>{value}</p>
       <p className="text-muted-foreground text-sm">{label}</p>
     </div>
   );
@@ -219,8 +242,8 @@ function StepCard({
   description: string;
 }) {
   return (
-    <div className="flex items-start gap-4 bg-card rounded-xl p-4 shadow-sm border border-border">
-      <div className="shrink-0 w-10 h-10 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center font-bold">
+    <div className="flex items-start gap-4 glass rounded-xl p-4">
+      <div className="shrink-0 w-10 h-10 bg-neon-primary/15 text-neon-primary rounded-full flex items-center justify-center font-bold">
         {number}
       </div>
       <div>

@@ -62,7 +62,7 @@ function BreathingExercise() {
     return (
       <button
         onClick={() => setIsActive(true)}
-        className="text-emerald-600 underline text-sm hover:text-emerald-700"
+        className="text-neon-success underline text-sm hover:text-neon-success/80 transition-colors"
       >
         Try a breathing exercise
       </button>
@@ -76,7 +76,7 @@ function BreathingExercise() {
           scale: phase === "inhale" ? 1.3 : phase === "exhale" ? 0.8 : 1,
         }}
         transition={{ duration: 4, ease: "easeInOut" }}
-        className="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center"
+        className="w-24 h-24 rounded-full bg-gradient-to-br from-neon-success to-neon-primary flex items-center justify-center glow-success"
       >
         <span className="text-white text-lg font-medium capitalize">
           {phase}
@@ -84,7 +84,7 @@ function BreathingExercise() {
       </motion.div>
       <button
         onClick={() => setIsActive(false)}
-        className="text-gray-500 text-sm hover:text-gray-700"
+        className="text-muted-foreground text-sm hover:text-foreground transition-colors"
       >
         Stop
       </button>
@@ -120,19 +120,19 @@ function BreakTimer({
 
   return (
     <div className="text-center">
-      <p className="text-4xl font-mono font-bold text-emerald-700">
+      <p className="text-4xl font-mono font-bold text-neon-success text-glow-success">
         {mins.toString().padStart(2, "0")}:{secs.toString().padStart(2, "0")}
       </p>
       <div className="flex gap-2 justify-center mt-4">
         <button
           onClick={() => setIsRunning(!isRunning)}
-          className="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200"
+          className="px-4 py-2 bg-neon-success/15 text-neon-success rounded-lg hover:bg-neon-success/25 transition-colors"
         >
           {isRunning ? "Pause" : "Resume"}
         </button>
         <button
           onClick={onComplete}
-          className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+          className="px-4 py-2 glass text-foreground rounded-lg transition-all"
         >
           End Break
         </button>
@@ -173,7 +173,7 @@ export const CalmMode = React.forwardRef<HTMLDivElement, CalmModeProps>(
         ref={ref}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="min-h-[400px] bg-linear-to-br from-emerald-50 via-teal-50 to-cyan-50 rounded-2xl border-2 border-emerald-200 p-8"
+        className="min-h-[400px] bg-neon-success/5 backdrop-blur-xl border border-neon-success/20 rounded-2xl p-8"
       >
         <AnimatePresence mode="wait">
           {showBreakTimer ? (
@@ -184,10 +184,10 @@ export const CalmMode = React.forwardRef<HTMLDivElement, CalmModeProps>(
               exit={{ opacity: 0, scale: 0.95 }}
               className="flex flex-col items-center justify-center min-h-[300px]"
             >
-              <h2 className="text-2xl font-semibold text-emerald-800 mb-2">
+              <h2 className="text-2xl font-semibold text-neon-success mb-2">
                 Take a breath 🌿
               </h2>
-              <p className="text-emerald-600 mb-8">
+              <p className="text-neon-success/70 mb-8">
                 Step away, stretch, hydrate. You&apos;ve earned it.
               </p>
               <BreakTimer
@@ -211,34 +211,36 @@ export const CalmMode = React.forwardRef<HTMLDivElement, CalmModeProps>(
                 >
                   🌱
                 </motion.div>
-                <h2 className="text-2xl font-semibold text-emerald-800 mb-2">
+                <h2 className="text-2xl font-semibold text-neon-success mb-2">
                   Hey{userName ? `, ${userName}` : ""}, take a moment.
                 </h2>
-                <p className="text-emerald-600 italic">
+                <p className="text-neon-success/70 italic">
                   &quot;{randomEncouragement}&quot;
                 </p>
               </div>
 
-              <div className="bg-white/60 rounded-xl p-6 mb-6">
-                <h3 className="font-medium text-emerald-800 mb-4 text-center">
+              <div className="glass rounded-xl p-6 mb-6">
+                <h3 className="font-medium text-neon-success mb-4 text-center">
                   Look what you&apos;ve accomplished 🌟
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-emerald-50 rounded-lg">
-                    <p className="text-3xl font-bold text-emerald-700">
+                  <div className="text-center p-4 bg-neon-success/10 rounded-lg">
+                    <p className="text-3xl font-bold text-neon-success text-glow-success">
                       {totalSolved}
                     </p>
-                    <p className="text-sm text-emerald-600">Problems solved</p>
+                    <p className="text-sm text-neon-success/70">
+                      Problems solved
+                    </p>
                   </div>
-                  <div className="text-center p-4 bg-orange-50 rounded-lg">
-                    <p className="text-3xl font-bold text-orange-600">
+                  <div className="text-center p-4 bg-neon-warning/10 rounded-lg">
+                    <p className="text-3xl font-bold text-neon-warning">
                       {currentStreak} 🔥
                     </p>
-                    <p className="text-sm text-orange-600">Day streak</p>
+                    <p className="text-sm text-neon-warning/70">Day streak</p>
                   </div>
                 </div>
                 {strongTopic && (
-                  <p className="text-center mt-4 text-emerald-700">
+                  <p className="text-center mt-4 text-neon-success/80">
                     You&apos;re especially good at{" "}
                     <strong>{strongTopic}</strong>!
                   </p>
@@ -248,7 +250,7 @@ export const CalmMode = React.forwardRef<HTMLDivElement, CalmModeProps>(
               <div className="space-y-3">
                 <button
                   onClick={() => setShowBreakTimer(true)}
-                  className="w-full py-4 px-6 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-4 px-6 bg-neon-success/15 hover:bg-neon-success/25 text-neon-success rounded-xl font-medium transition-all hover:glow-success-sm flex items-center justify-center gap-2"
                 >
                   <span>🧘</span>
                   Take a {breakDurationMinutes}-minute break
@@ -257,7 +259,7 @@ export const CalmMode = React.forwardRef<HTMLDivElement, CalmModeProps>(
                 {onEasyPractice && (
                   <button
                     onClick={() => onEasyPractice()}
-                    className="w-full py-4 px-6 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                    className="w-full py-4 px-6 bg-neon-primary/10 hover:bg-neon-primary/20 text-neon-primary rounded-xl font-medium transition-all hover:glow-primary-sm flex items-center justify-center gap-2"
                   >
                     <span>✨</span>
                     Try some easy wins
@@ -272,7 +274,7 @@ export const CalmMode = React.forwardRef<HTMLDivElement, CalmModeProps>(
                 {onContinueNormally && (
                   <button
                     onClick={() => onContinueNormally()}
-                    className="w-full py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors"
+                    className="w-full py-3 px-6 glass text-foreground rounded-xl font-medium transition-all"
                   >
                     I&apos;m okay, continue normally
                   </button>

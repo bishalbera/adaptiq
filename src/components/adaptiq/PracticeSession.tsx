@@ -52,38 +52,38 @@ export type PracticeSessionProps = z.infer<typeof practiceSessionSchema>;
 const QUICK_MODE_DELAY = 3;
 
 const difficultyConfig = {
-  1: { label: "Easy", color: "bg-green-100 text-green-800" },
-  2: { label: "Medium", color: "bg-yellow-100 text-yellow-800" },
-  3: { label: "Hard", color: "bg-red-100 text-red-800" },
+  1: { label: "Easy", color: "bg-neon-success/15 text-neon-success" },
+  2: { label: "Medium", color: "bg-neon-warning/15 text-neon-warning" },
+  3: { label: "Hard", color: "bg-neon-error/15 text-neon-error" },
 };
 
 const subjectColors = {
-  physics: "bg-blue-100 text-blue-800",
-  chemistry: "bg-purple-100 text-purple-800",
-  math: "bg-orange-100 text-orange-800",
+  physics: "bg-neon-primary/15 text-neon-primary",
+  chemistry: "bg-neon-secondary/15 text-neon-secondary",
+  math: "bg-neon-warning/15 text-neon-warning",
 };
 
 const modeStyles = {
   standard: {
-    card: "bg-white border-gray-200",
-    correct: "bg-green-50 border-green-500",
-    incorrect: "bg-red-50 border-red-500",
-    optionHover: "hover:bg-gray-50 hover:border-gray-400",
-    text: "text-gray-800",
+    card: "glass",
+    correct: "bg-neon-success/10 border-neon-success glow-success-sm",
+    incorrect: "bg-neon-error/10 border-neon-error glow-error-sm",
+    optionHover: "hover:bg-white/5 hover:border-white/20",
+    text: "text-foreground",
   },
   quick: {
-    card: "bg-gray-900 border-gray-700",
-    correct: "bg-green-900/50 border-green-500",
-    incorrect: "bg-red-900/50 border-red-500",
-    optionHover: "hover:bg-gray-800 hover:border-gray-500",
-    text: "text-white",
+    card: "glass-strong",
+    correct: "bg-neon-success/10 border-neon-success glow-success-sm",
+    incorrect: "bg-neon-error/10 border-neon-error glow-error-sm",
+    optionHover: "hover:bg-white/8 hover:border-white/20",
+    text: "text-foreground",
   },
   calm: {
-    card: "bg-emerald-50 border-emerald-200",
-    correct: "bg-emerald-100 border-emerald-500",
-    incorrect: "bg-amber-50 border-amber-400",
-    optionHover: "hover:bg-emerald-100 hover:border-emerald-400",
-    text: "text-gray-800",
+    card: "bg-neon-success/5 backdrop-blur-xl border border-neon-success/20",
+    correct: "bg-neon-success/10 border-neon-success",
+    incorrect: "bg-neon-warning/10 border-neon-warning",
+    optionHover: "hover:bg-neon-success/10 hover:border-neon-success/30",
+    text: "text-foreground",
   },
 };
 
@@ -156,13 +156,13 @@ export const PracticeSession = React.forwardRef<
     return (
       <div
         ref={ref}
-        className="rounded-xl border-2 border-gray-200 bg-white p-8 text-center"
+        className="glass rounded-xl p-8 text-center"
       >
         <div className="text-4xl mb-4">📚</div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+        <h3 className="text-lg font-semibold text-foreground mb-2">
           Loading questions...
         </h3>
-        <p className="text-gray-500 text-sm">
+        <p className="text-muted-foreground text-sm">
           Please wait while we fetch your practice questions.
         </p>
       </div>
@@ -180,13 +180,13 @@ export const PracticeSession = React.forwardRef<
     return (
       <div
         ref={ref}
-        className="rounded-xl border-2 border-gray-200 bg-white p-8 text-center"
+        className="glass rounded-xl p-8 text-center"
       >
         <div className="text-4xl mb-4 animate-pulse">⏳</div>
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">
+        <h3 className="text-lg font-semibold text-foreground mb-2">
           Preparing question...
         </h3>
-        <p className="text-gray-500 text-sm">Almost ready!</p>
+        <p className="text-muted-foreground text-sm">Almost ready!</p>
       </div>
     );
   }
@@ -194,27 +194,23 @@ export const PracticeSession = React.forwardRef<
   const getOptionStyle = (option: "a" | "b" | "c" | "d") => {
     if (!isAnswered) {
       return cn(
-        "border-2 border-gray-200 rounded-lg p-4 cursor-pointer transition-all",
+        "border border-white/10 rounded-lg p-4 cursor-pointer transition-all",
         styles.optionHover,
-        validMode === "quick" && "border-gray-600",
       );
     }
 
     if (option === currentQuestion?.correctAnswer) {
-      return "border-2 border-green-500 bg-green-50 rounded-lg p-4";
+      return "border border-neon-success bg-neon-success/10 rounded-lg p-4";
     }
 
     if (
       option === selectedAnswer &&
       option !== currentQuestion?.correctAnswer
     ) {
-      return "border-2 border-red-500 bg-red-50 rounded-lg p-4";
+      return "border border-neon-error bg-neon-error/10 rounded-lg p-4";
     }
 
-    return cn(
-      "border-2 border-gray-200 rounded-lg p-4 opacity-50",
-      validMode === "quick" && "border-gray-600",
-    );
+    return "border border-white/5 rounded-lg p-4 opacity-50";
   };
 
   if (sessionComplete) {
@@ -225,19 +221,16 @@ export const PracticeSession = React.forwardRef<
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className={cn(
-          "rounded-xl border-2 p-8 text-center",
-          validMode === "calm"
-            ? "bg-emerald-50 border-emerald-200"
-            : "bg-white border-gray-200",
+          "glass rounded-xl p-8 text-center",
         )}
       >
         <div className="text-6xl mb-4">
           {percentage >= 80 ? "🎉" : percentage >= 60 ? "👍" : "💪"}
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        <h2 className="text-2xl font-bold text-foreground mb-2">
           Session Complete!
         </h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-muted-foreground mb-6">
           You got {score.correct} out of {score.total} correct ({percentage}%)
         </p>
         <div className="flex justify-center gap-4">
@@ -250,7 +243,7 @@ export const PracticeSession = React.forwardRef<
               setSessionComplete(false);
               setCountdown(QUICK_MODE_DELAY);
             }}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-3 bg-neon-primary text-white rounded-lg hover:bg-neon-primary/90 transition-all glow-primary-sm hover:glow-primary"
           >
             Practice Again
           </button>
@@ -271,9 +264,9 @@ export const PracticeSession = React.forwardRef<
       {/* Progress Bar */}
       {showProgress && (
         <div className="flex items-center gap-4">
-          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-blue-600"
+              className="h-full bg-neon-primary"
               initial={{ width: 0 }}
               animate={{
                 width: `${((currentIndex + 1) / questions.length) * 100}%`,
@@ -282,14 +275,13 @@ export const PracticeSession = React.forwardRef<
           </div>
           <span
             className={cn(
-              "text-sm font-medium",
-              validMode === "quick" ? "text-gray-400" : "text-gray-600",
+              "text-sm font-medium text-muted-foreground",
             )}
           >
             {currentIndex + 1}/{questions.length}
           </span>
           {score.total > 0 && (
-            <span className="text-sm font-medium text-green-600">
+            <span className="text-sm font-medium text-neon-success">
               {score.correct}/{score.total} ✓
             </span>
           )}
@@ -304,7 +296,7 @@ export const PracticeSession = React.forwardRef<
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
           className={cn(
-            "rounded-xl border-2 p-6 shadow-sm transition-all",
+            "rounded-xl p-6 transition-all",
             isAnswered
               ? isCorrect
                 ? styles.correct
@@ -323,7 +315,7 @@ export const PracticeSession = React.forwardRef<
               {currentQuestion.subject.charAt(0).toUpperCase() +
                 currentQuestion.subject.slice(1)}
             </span>
-            <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+            <span className="px-2 py-1 rounded-full text-xs font-medium bg-white/5 text-muted-foreground">
               {currentQuestion.topic}
             </span>
             <span
@@ -360,23 +352,16 @@ export const PracticeSession = React.forwardRef<
                     className={cn(
                       "shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm",
                       isAnswered && key === currentQuestion.correctAnswer
-                        ? "bg-green-500 text-white"
+                        ? "bg-neon-success text-white"
                         : isAnswered && key === selectedAnswer
-                          ? "bg-red-500 text-white"
-                          : validMode === "quick"
-                            ? "bg-gray-700 text-gray-300"
-                            : "bg-gray-100 text-gray-600",
+                          ? "bg-neon-error text-white"
+                          : "bg-white/10 text-muted-foreground",
                     )}
                   >
                     {optionLabels[index]}
                   </span>
                   <span
-                    className={cn(
-                      "pt-1",
-                      validMode === "quick" && !isAnswered
-                        ? "text-gray-200"
-                        : "",
-                    )}
+                    className="pt-1 text-foreground"
                   >
                     {currentQuestion.options[key]}
                   </span>
@@ -398,21 +383,21 @@ export const PracticeSession = React.forwardRef<
                 <div
                   className={cn(
                     "rounded-lg p-4 mb-4",
-                    isCorrect ? "bg-green-100" : "bg-red-100",
+                    isCorrect ? "bg-neon-success/10" : "bg-neon-error/10",
                   )}
                 >
                   <div className="flex items-center gap-2">
                     {isCorrect ? (
                       <>
                         <span className="text-2xl">✓</span>
-                        <span className="font-semibold text-green-800">
+                        <span className="font-semibold text-neon-success">
                           Correct!
                         </span>
                       </>
                     ) : (
                       <>
                         <span className="text-2xl">✗</span>
-                        <span className="font-semibold text-red-800">
+                        <span className="font-semibold text-neon-error">
                           Incorrect. The answer is{" "}
                           {currentQuestion.correctAnswer.toUpperCase()}.
                         </span>
@@ -423,11 +408,11 @@ export const PracticeSession = React.forwardRef<
 
                 {/* Explanation - hide in quick mode for speed */}
                 {validMode !== "quick" && (
-                  <div className="bg-blue-50 rounded-lg p-4 mb-4">
-                    <h4 className="font-semibold text-blue-900 mb-2">
+                  <div className="bg-neon-primary/10 rounded-lg p-4 mb-4 border border-neon-primary/20">
+                    <h4 className="font-semibold text-neon-primary mb-2">
                       Explanation
                     </h4>
-                    <p className="text-blue-800">
+                    <p className="text-foreground">
                       {currentQuestion.explanation}
                     </p>
                   </div>
@@ -437,11 +422,11 @@ export const PracticeSession = React.forwardRef<
                 {!isCorrect &&
                   currentQuestion.commonMistake &&
                   validMode !== "quick" && (
-                    <div className="bg-amber-50 rounded-lg p-4 mb-4">
-                      <h4 className="font-semibold text-amber-900 mb-2">
+                    <div className="bg-neon-warning/10 rounded-lg p-4 mb-4 border border-neon-warning/20">
+                      <h4 className="font-semibold text-neon-warning mb-2">
                         Common Mistake
                       </h4>
-                      <p className="text-amber-800">
+                      <p className="text-foreground">
                         {currentQuestion.commonMistake}
                       </p>
                     </div>
@@ -451,12 +436,12 @@ export const PracticeSession = React.forwardRef<
                 <div className="mt-4">
                   {validMode === "quick" ? (
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-400">
+                      <span className="text-sm text-muted-foreground">
                         Next in {countdown}s...
                       </span>
                       <button
                         onClick={goToNextQuestion}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        className="px-4 py-2 bg-neon-primary text-white rounded-lg hover:bg-neon-primary/90 transition-all glow-primary-sm text-sm font-medium"
                       >
                         {currentIndex < questions.length - 1
                           ? "Skip →"
@@ -466,7 +451,7 @@ export const PracticeSession = React.forwardRef<
                   ) : validMode === "calm" ? (
                     <button
                       onClick={goToNextQuestion}
-                      className="w-full py-4 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                      className="w-full py-4 bg-neon-success/15 hover:bg-neon-success/25 text-neon-success rounded-xl font-medium transition-all hover:glow-success-sm flex items-center justify-center gap-2"
                     >
                       <span>🌱</span>
                       {currentIndex < questions.length - 1
@@ -476,7 +461,7 @@ export const PracticeSession = React.forwardRef<
                   ) : (
                     <button
                       onClick={goToNextQuestion}
-                      className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                      className="w-full py-3 bg-neon-primary text-white hover:bg-neon-primary/90 rounded-lg font-medium transition-all glow-primary-sm hover:glow-primary flex items-center justify-center gap-2"
                     >
                       {currentIndex < questions.length - 1 ? (
                         <>

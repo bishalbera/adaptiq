@@ -58,38 +58,38 @@ export type QuestionCardProps = z.infer<typeof questionCardSchema>;
 
 const modeStyles = {
   standard: {
-    card: "bg-white border-gray-200",
-    correct: "bg-green-50 border-green-500",
-    incorrect: "bg-red-50 border-red-500",
-    optionHover: "hover:bg-gray-50 hover:border-gray-400",
-    accent: "text-blue-600",
+    card: "glass",
+    correct: "bg-neon-success/10 border-neon-success glow-success-sm",
+    incorrect: "bg-neon-error/10 border-neon-error glow-error-sm",
+    optionHover: "hover:bg-white/5 hover:border-white/20",
+    accent: "text-neon-primary",
   },
   quick: {
-    card: "bg-gray-900 border-gray-700",
-    correct: "bg-green-900/50 border-green-500",
-    incorrect: "bg-red-900/50 border-red-500",
-    optionHover: "hover:bg-gray-800 hover:border-gray-500",
-    accent: "text-blue-400",
+    card: "glass-strong",
+    correct: "bg-neon-success/10 border-neon-success glow-success-sm",
+    incorrect: "bg-neon-error/10 border-neon-error glow-error-sm",
+    optionHover: "hover:bg-white/8 hover:border-white/20",
+    accent: "text-neon-primary",
   },
   calm: {
-    card: "bg-emerald-50 border-emerald-200",
-    correct: "bg-emerald-100 border-emerald-500",
-    incorrect: "bg-amber-50 border-amber-400",
-    optionHover: "hover:bg-emerald-100 hover:border-emerald-400",
-    accent: "text-emerald-700",
+    card: "bg-neon-success/5 backdrop-blur-xl border border-neon-success/20",
+    correct: "bg-neon-success/10 border-neon-success",
+    incorrect: "bg-neon-warning/10 border-neon-warning",
+    optionHover: "hover:bg-neon-success/10 hover:border-neon-success/30",
+    accent: "text-neon-success",
   },
 };
 
 const difficultyConfig = {
-  1: { label: "Easy", color: "bg-green-100 text-green-800" },
-  2: { label: "Medium", color: "bg-yellow-100 text-yellow-800" },
-  3: { label: "Hard", color: "bg-red-100 text-red-800" },
+  1: { label: "Easy", color: "bg-neon-success/15 text-neon-success" },
+  2: { label: "Medium", color: "bg-neon-warning/15 text-neon-warning" },
+  3: { label: "Hard", color: "bg-neon-error/15 text-neon-error" },
 };
 
 const subjectColors = {
-  physics: "bg-blue-100 text-blue-800",
-  chemistry: "bg-purple-100 text-purple-800",
-  math: "bg-orange-100 text-orange-800",
+  physics: "bg-neon-primary/15 text-neon-primary",
+  chemistry: "bg-neon-secondary/15 text-neon-secondary",
+  math: "bg-neon-warning/15 text-neon-warning",
 };
 
 export const QuestionCard = React.forwardRef<HTMLDivElement, QuestionCardProps>(
@@ -159,20 +159,20 @@ export const QuestionCard = React.forwardRef<HTMLDivElement, QuestionCardProps>(
     const getOptionStyle = (option: "a" | "b" | "c" | "d") => {
       if (!isAnswered) {
         return cn(
-          "border-2 border-gray-200 rounded-lg p-4 cursor-pointer transition-all",
+          "border border-white/10 rounded-lg p-4 cursor-pointer transition-all",
           styles.optionHover,
         );
       }
 
       if (option === correctAnswer) {
-        return "border-2 border-green-500 bg-green-50 rounded-lg p-4";
+        return "border border-neon-success bg-neon-success/10 rounded-lg p-4";
       }
 
       if (option === selectedAnswer && option !== correctAnswer) {
-        return "border-2 border-red-500 bg-red-50 rounded-lg p-4";
+        return "border border-neon-error bg-neon-error/10 rounded-lg p-4";
       }
 
-      return "border-2 border-gray-200 rounded-lg p-4 opacity-50";
+      return "border border-white/5 rounded-lg p-4 opacity-50";
     };
 
     const optionLabels = ["A", "B", "C", "D"];
@@ -185,13 +185,13 @@ export const QuestionCard = React.forwardRef<HTMLDivElement, QuestionCardProps>(
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         className={cn(
-          "rounded-xl border-2 p-6 shadow-sm transition-all",
+          "rounded-xl p-6 transition-all",
           isAnswered
             ? isCorrect
               ? styles.correct
               : styles.incorrect
             : styles.card,
-          mode === "quick" && "text-white",
+          mode === "quick" && "text-foreground",
         )}
       >
         {/* Header: Subject, Topic, Difficulty */}
@@ -204,7 +204,7 @@ export const QuestionCard = React.forwardRef<HTMLDivElement, QuestionCardProps>(
           >
             {subject.charAt(0).toUpperCase() + subject.slice(1)}
           </span>
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-white/5 text-muted-foreground">
             {topic}
           </span>
           <span
@@ -222,7 +222,7 @@ export const QuestionCard = React.forwardRef<HTMLDivElement, QuestionCardProps>(
           <p
             className={cn(
               "text-lg font-medium leading-relaxed",
-              mode === "quick" ? "text-white" : "text-gray-800",
+              "text-foreground",
             )}
           >
             {questionText}
@@ -244,21 +244,16 @@ export const QuestionCard = React.forwardRef<HTMLDivElement, QuestionCardProps>(
                   className={cn(
                     "shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm",
                     isAnswered && key === correctAnswer
-                      ? "bg-green-500 text-white"
+                      ? "bg-neon-success text-white"
                       : isAnswered && key === selectedAnswer
-                        ? "bg-red-500 text-white"
-                        : mode === "quick"
-                          ? "bg-gray-700 text-gray-300"
-                          : "bg-gray-100 text-gray-600",
+                        ? "bg-neon-error text-white"
+                        : "bg-white/10 text-muted-foreground",
                   )}
                 >
                   {optionLabels[index]}
                 </span>
                 <span
-                  className={cn(
-                    "pt-1",
-                    mode === "quick" && !isAnswered ? "text-gray-200" : "",
-                  )}
+                  className="pt-1 text-foreground"
                 >
                   {options[key]}
                 </span>
@@ -280,21 +275,21 @@ export const QuestionCard = React.forwardRef<HTMLDivElement, QuestionCardProps>(
               <div
                 className={cn(
                   "rounded-lg p-4 mb-4",
-                  isCorrect ? "bg-green-100" : "bg-red-100",
+                  isCorrect ? "bg-neon-success/10" : "bg-neon-error/10",
                 )}
               >
                 <div className="flex items-center gap-2">
                   {isCorrect ? (
                     <>
                       <span className="text-2xl">✓</span>
-                      <span className="font-semibold text-green-800">
+                      <span className="font-semibold text-neon-success">
                         Correct!
                       </span>
                     </>
                   ) : (
                     <>
                       <span className="text-2xl">✗</span>
-                      <span className="font-semibold text-red-800">
+                      <span className="font-semibold text-neon-error">
                         Incorrect. The answer is {correctAnswer.toUpperCase()}.
                       </span>
                     </>
@@ -303,20 +298,20 @@ export const QuestionCard = React.forwardRef<HTMLDivElement, QuestionCardProps>(
               </div>
 
               {/* Explanation */}
-              <div className="bg-blue-50 rounded-lg p-4 mb-4">
-                <h4 className="font-semibold text-blue-900 mb-2">
+              <div className="bg-neon-primary/10 rounded-lg p-4 mb-4 border border-neon-primary/20">
+                <h4 className="font-semibold text-neon-primary mb-2">
                   Explanation
                 </h4>
-                <p className="text-blue-800">{explanation}</p>
+                <p className="text-foreground">{explanation}</p>
               </div>
 
               {/* Common Mistake (if wrong and available) */}
               {!isCorrect && commonMistake && (
-                <div className="bg-amber-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-amber-900 mb-2">
+                <div className="bg-neon-warning/10 rounded-lg p-4 border border-neon-warning/20">
+                  <h4 className="font-semibold text-neon-warning mb-2">
                     Common Mistake
                   </h4>
-                  <p className="text-amber-800">{commonMistake}</p>
+                  <p className="text-foreground">{commonMistake}</p>
                 </div>
               )}
 
@@ -326,17 +321,12 @@ export const QuestionCard = React.forwardRef<HTMLDivElement, QuestionCardProps>(
                   {mode === "quick" ? (
                     // Quick mode: Auto-advance with countdown
                     <div className="flex items-center justify-between">
-                      <span
-                        className={cn(
-                          "text-sm",
-                          mode === "quick" ? "text-gray-400" : "text-gray-500",
-                        )}
-                      >
+                      <span className="text-sm text-muted-foreground">
                         Next question in {countdown}s...
                       </span>
                       <button
                         onClick={onNext}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        className="px-4 py-2 bg-neon-primary text-white rounded-lg hover:bg-neon-primary/90 transition-all glow-primary-sm text-sm font-medium"
                       >
                         Skip →
                       </button>
@@ -345,7 +335,7 @@ export const QuestionCard = React.forwardRef<HTMLDivElement, QuestionCardProps>(
                     // Calm mode: Gentle prompt
                     <button
                       onClick={onNext}
-                      className="w-full py-4 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                      className="w-full py-4 bg-neon-success/15 hover:bg-neon-success/25 text-neon-success rounded-xl font-medium transition-all hover:glow-success-sm flex items-center justify-center gap-2"
                     >
                       <span>🌱</span>
                       Ready for another?
@@ -354,7 +344,7 @@ export const QuestionCard = React.forwardRef<HTMLDivElement, QuestionCardProps>(
                     // Standard mode: Clear next button
                     <button
                       onClick={onNext}
-                      className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                      className="w-full py-3 bg-neon-primary text-white hover:bg-neon-primary/90 rounded-lg font-medium transition-all glow-primary-sm hover:glow-primary flex items-center justify-center gap-2"
                     >
                       Next Question
                       <svg

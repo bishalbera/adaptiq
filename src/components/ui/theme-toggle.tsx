@@ -50,9 +50,9 @@ export function ThemeToggle({ className }: { className?: string }) {
       }}
       className={cn(
         "inline-flex h-9 w-9 items-center justify-center rounded-md",
-        "border border-border bg-card text-foreground",
-        "hover:bg-accent hover:text-accent-foreground",
-        "transition-colors",
+        "glass text-foreground",
+        "hover:glow-primary-sm",
+        "transition-all",
         className,
       )}
     >

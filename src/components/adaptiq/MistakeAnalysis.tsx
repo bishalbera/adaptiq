@@ -60,33 +60,33 @@ const mistakeTypeConfig: Record<
   conceptual: {
     label: "Conceptual Gap",
     icon: "🧠",
-    color: "bg-purple-100 text-purple-800 border-purple-200",
+    color: "bg-neon-secondary/15 text-neon-secondary border-neon-secondary/20",
     tip: "Review the underlying concept before attempting similar problems.",
   },
   calculation: {
     label: "Calculation Error",
     icon: "🔢",
-    color: "bg-blue-100 text-blue-800 border-blue-200",
+    color: "bg-neon-primary/15 text-neon-primary border-neon-primary/20",
     tip: "Double-check your arithmetic. Write out each step clearly.",
   },
   careless: {
     label: "Careless Mistake",
     icon: "👀",
-    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+    color: "bg-neon-warning/15 text-neon-warning border-neon-warning/20",
     tip: "Slow down and read each option carefully before selecting.",
   },
   misread: {
     label: "Misread Question",
     icon: "📖",
-    color: "bg-orange-100 text-orange-800 border-orange-200",
+    color: "bg-neon-warning/15 text-neon-warning border-neon-warning/20",
     tip: "Underline key words in the question to avoid misreading.",
   },
 };
 
 const subjectColors = {
-  physics: "bg-blue-100 text-blue-800",
-  chemistry: "bg-purple-100 text-purple-800",
-  math: "bg-orange-100 text-orange-800",
+  physics: "bg-neon-primary/15 text-neon-primary",
+  chemistry: "bg-neon-secondary/15 text-neon-secondary",
+  math: "bg-neon-warning/15 text-neon-warning",
 };
 
 export const MistakeAnalysis = React.forwardRef<
@@ -127,11 +127,11 @@ export const MistakeAnalysis = React.forwardRef<
       return (
         <div
           ref={ref}
-          className="bg-white rounded-xl border-2 border-gray-200 shadow-sm p-6"
+          className="glass rounded-xl p-6"
         >
           <div className="flex items-center gap-3">
-            <div className="animate-spin rounded-full h-5 w-5 border-2 border-red-500 border-t-transparent" />
-            <span className="text-gray-600">Analyzing your answer...</span>
+            <div className="animate-spin rounded-full h-5 w-5 border-2 border-neon-error border-t-transparent" />
+            <span className="text-muted-foreground">Analyzing your answer...</span>
           </div>
         </div>
       );
@@ -142,13 +142,13 @@ export const MistakeAnalysis = React.forwardRef<
         ref={ref}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl border-2 border-red-100 shadow-sm overflow-hidden"
+        className="glass rounded-xl overflow-hidden"
       >
-        <div className="bg-red-50 px-6 py-4 border-b border-red-100">
+        <div className="bg-neon-error/10 px-6 py-4 border-b border-neon-error/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-2xl">📊</span>
-              <h2 className="text-lg font-semibold text-red-800">
+              <h2 className="text-lg font-semibold text-neon-error">
                 Mistake Analysis
               </h2>
             </div>
@@ -161,7 +161,7 @@ export const MistakeAnalysis = React.forwardRef<
               >
                 {subject.charAt(0).toUpperCase() + subject.slice(1)}
               </span>
-              <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+              <span className="px-2 py-1 rounded-full text-xs font-medium bg-white/5 text-muted-foreground">
                 {topic}
               </span>
             </div>
@@ -169,35 +169,35 @@ export const MistakeAnalysis = React.forwardRef<
         </div>
 
         <div className="p-6 space-y-6">
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-500 mb-2">Question</h3>
-            <p className="text-gray-800">{questionText}</p>
+          <div className="glass-subtle rounded-lg p-4">
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">Question</h3>
+            <p className="text-foreground">{questionText}</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="rounded-lg border-2 border-red-200 bg-red-50 p-4">
+            <div className="rounded-lg border border-neon-error/30 bg-neon-error/10 p-4">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl">✗</span>
-                <h3 className="font-semibold text-red-800">Your Answer</h3>
+                <h3 className="font-semibold text-neon-error">Your Answer</h3>
               </div>
               <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center font-semibold text-sm">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-neon-error text-white flex items-center justify-center font-semibold text-sm">
                   {selectedAnswer.toUpperCase()}
                 </span>
-                <p className="text-red-900 pt-1">{options[selectedAnswer]}</p>
+                <p className="text-foreground pt-1">{options[selectedAnswer]}</p>
               </div>
             </div>
 
-            <div className="rounded-lg border-2 border-green-200 bg-green-50 p-4">
+            <div className="rounded-lg border border-neon-success/30 bg-neon-success/10 p-4">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl">✓</span>
-                <h3 className="font-semibold text-green-800">Correct Answer</h3>
+                <h3 className="font-semibold text-neon-success">Correct Answer</h3>
               </div>
               <div className="flex items-start gap-3">
-                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center font-semibold text-sm">
+                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-neon-success text-white flex items-center justify-center font-semibold text-sm">
                   {correctAnswer.toUpperCase()}
                 </span>
-                <p className="text-green-900 pt-1">{options[correctAnswer]}</p>
+                <p className="text-foreground pt-1">{options[correctAnswer]}</p>
               </div>
             </div>
           </div>
@@ -224,15 +224,15 @@ export const MistakeAnalysis = React.forwardRef<
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
-              className="rounded-lg border-2 border-amber-300 bg-amber-50 p-4"
+              className="rounded-lg border border-neon-warning/30 bg-neon-warning/10 p-4"
             >
               <div className="flex items-start gap-3">
                 <span className="text-2xl">⚠️</span>
                 <div>
-                  <h4 className="font-semibold text-amber-800">
+                  <h4 className="font-semibold text-neon-warning">
                     Pattern Detected: {similarMistakeCount} similar mistakes
                   </h4>
-                  <p className="text-sm text-amber-700 mt-1">
+                  <p className="text-sm text-neon-warning/80 mt-1">
                     {patternMessage ||
                       `You've made this type of error ${similarMistakeCount} times. Consider focusing on this area.`}
                   </p>
@@ -241,23 +241,23 @@ export const MistakeAnalysis = React.forwardRef<
             </motion.div>
           )}
 
-          <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+          <div className="bg-neon-primary/10 rounded-lg p-4 border border-neon-primary/20">
             <div className="flex items-center gap-2 mb-3">
               <span className="text-xl">💡</span>
-              <h3 className="font-semibold text-blue-800">
+              <h3 className="font-semibold text-neon-primary">
                 Why is this correct?
               </h3>
             </div>
-            <p className="text-blue-900">{explanation}</p>
+            <p className="text-foreground">{explanation}</p>
           </div>
 
           {commonMistake && (
-            <div className="bg-amber-50 rounded-lg p-4 border border-amber-100">
+            <div className="bg-neon-warning/10 rounded-lg p-4 border border-neon-warning/20">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl">🎯</span>
-                <h3 className="font-semibold text-amber-800">Common Pitfall</h3>
+                <h3 className="font-semibold text-neon-warning">Common Pitfall</h3>
               </div>
-              <p className="text-amber-900">{commonMistake}</p>
+              <p className="text-foreground">{commonMistake}</p>
             </div>
           )}
 
@@ -265,7 +265,7 @@ export const MistakeAnalysis = React.forwardRef<
             {onPracticeSimilar && (
               <button
                 onClick={() => onPracticeSimilar()}
-                className="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                className="flex-1 py-3 px-6 bg-neon-primary text-white hover:bg-neon-primary/90 rounded-lg font-medium transition-all glow-primary-sm hover:glow-primary flex items-center justify-center gap-2"
               >
                 <span>🔄</span>
                 Practice Similar Problems
@@ -275,10 +275,10 @@ export const MistakeAnalysis = React.forwardRef<
               <button
                 onClick={() => onContinue()}
                 className={cn(
-                  "flex-1 py-3 px-6 rounded-lg font-medium transition-colors flex items-center justify-center gap-2",
+                  "flex-1 py-3 px-6 rounded-lg font-medium transition-all flex items-center justify-center gap-2",
                   onPracticeSimilar
-                    ? "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                    : "bg-blue-600 hover:bg-blue-700 text-white",
+                    ? "glass text-foreground"
+                    : "bg-neon-primary text-white hover:bg-neon-primary/90 glow-primary-sm hover:glow-primary",
                 )}
               >
                 Continue
@@ -300,7 +300,7 @@ export const MistakeAnalysis = React.forwardRef<
           </div>
 
           <div className="text-center pt-2">
-            <p className="text-sm text-gray-500 italic">
+            <p className="text-sm text-muted-foreground italic">
               &quot;Mistakes are proof that you are trying. Learn from them and
               keep going!&quot;
             </p>

@@ -677,15 +677,15 @@ const MessageInputInternal = React.forwardRef<
       >
         <div
           className={cn(
-            "relative flex flex-col rounded-xl bg-background shadow-md p-2 px-3",
+            "relative flex flex-col rounded-xl glass p-2 px-3",
             isDragging
-              ? "border border-dashed border-emerald-400"
-              : "border border-border",
+              ? "border border-dashed border-neon-primary"
+              : "border border-white/10",
           )}
         >
           {isDragging && (
-            <div className="absolute inset-0 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/30 flex items-center justify-center pointer-events-none z-20">
-              <p className="text-emerald-700 dark:text-emerald-300 font-medium">
+            <div className="absolute inset-0 rounded-xl bg-neon-primary/10 backdrop-blur-sm flex items-center justify-center pointer-events-none z-20">
+              <p className="text-neon-primary font-medium">
                 Drop files here to add to conversation
               </p>
             </div>
@@ -1034,7 +1034,7 @@ const MessageInputSubmitButton = React.forwardRef<
   };
 
   const buttonClasses = cn(
-    "w-10 h-10 bg-foreground text-background rounded-lg hover:bg-foreground/90 disabled:opacity-50 flex items-center justify-center enabled:cursor-pointer",
+    "w-10 h-10 bg-neon-primary text-white rounded-lg hover:bg-neon-primary/90 disabled:opacity-50 flex items-center justify-center enabled:cursor-pointer glow-primary-sm transition-all",
     className,
   );
 

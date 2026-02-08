@@ -347,7 +347,6 @@ export const tools: TamboTool[] = [
       let hoursUntilExam = 168; // Default: 1 week
       let panicLevel: "low" | "medium" | "high" | "extreme" = "low";
 
-      // Parse timing
       if (
         lower.includes("today") ||
         lower.includes("in a few hours") ||
@@ -369,7 +368,6 @@ export const tools: TamboTool[] = [
         hoursUntilExam = 120;
       }
 
-      // Detect panic level
       const extremePanic = [
         "going to fail",
         "not ready",
@@ -390,7 +388,6 @@ export const tools: TamboTool[] = [
         panicLevel = "medium";
       }
 
-      // Escalate if exam is very close
       if (hoursUntilExam <= 6 && panicLevel !== "extreme") {
         panicLevel = panicLevel === "low" ? "medium" : "high";
       }

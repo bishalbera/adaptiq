@@ -134,13 +134,16 @@ export const ProgressCard = React.forwardRef<HTMLDivElement, ProgressCardProps>(
       totalAttempted,
       totalCorrect,
       currentStreak,
-      strongTopics = [],
-      weakTopics = [],
+      strongTopics: _strongTopics,
+      weakTopics: _weakTopics,
       daysUntilExam,
       variant = "default",
     },
     ref,
   ) => {
+    const strongTopics = _strongTopics ?? [];
+    const weakTopics = _weakTopics ?? [];
+
     const accuracy =
       totalAttempted > 0
         ? Math.round((totalCorrect / totalAttempted) * 100)

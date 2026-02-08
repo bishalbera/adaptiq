@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils";
 import { THEME_STORAGE_KEY, type ThemePreference } from "@/lib/theme";
 import { Moon, Sun } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function readThemeFromDom(): ThemePreference {
   if (typeof document === "undefined") {
@@ -28,15 +28,21 @@ function persistTheme(theme: ThemePreference) {
 }
 
 export function ThemeToggle({ className }: { className?: string }) {
-  const [theme, setTheme] = useState<ThemePreference>(() => readThemeFromDom());
+  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<ThemePreference>("dark");
+
+  useEffect(() => {
+    setTheme(readThemeFromDom());
+    setMounted(true);
+  }, []);
 
   const nextTheme: ThemePreference = theme === "dark" ? "light" : "dark";
 
   return (
     <button
       type="button"
-      aria-label={`Switch to ${nextTheme} theme`}
-      title={`Switch to ${nextTheme} theme`}
+      aria-label={mounted ? `Switch to ${nextTheme} theme` : "Toggle theme"}
+      title={mounted ? `Switch to ${nextTheme} theme` : "Toggle theme"}
       onClick={() => {
         writeThemeToDom(nextTheme);
         persistTheme(nextTheme);
@@ -50,7 +56,7 @@ export function ThemeToggle({ className }: { className?: string }) {
         className,
       )}
     >
-      {theme === "dark" ? (
+      {!mounted || theme === "dark" ? (
         <Sun className="h-4 w-4" aria-hidden="true" />
       ) : (
         <Moon className="h-4 w-4" aria-hidden="true" />

@@ -123,7 +123,7 @@ Detect their emotional state and panic level.`;
     }
 
     const response = await anthropic.messages.create({
-      model: "claude-3-5-haiku-20241022",
+      model: "claude-opus-4-5",
       max_tokens: 500,
       messages: [{ role: "user", content: prompt }],
       system: systemPrompt,
